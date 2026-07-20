@@ -10,14 +10,24 @@
 #include "engine/resources/ResourcesController.hpp"
 #include "spdlog/spdlog.h"
 
-#include <linux/input-event-codes.h>
+class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
+public:
+    void on_mouse_move(engine::platform::MousePosition position) override;
+};
+
+void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
+    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
+    camera->rotate_camera(position.dx, position.dy);
+}
 
 void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
 }
 bool app::MainController::loop() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    if (platform->key(engine::platform::KEY_ESCAPE).is_down()) {
+    if (platform->key(engine::platform::KeyId::KEY_ESCAPE).is_down()) {
         return false;
     }
     return true;
@@ -51,4 +61,26 @@ void app::MainController::draw_boat() {
 void app::MainController::draw() {
 
     draw_boat();
+}
+void app::MainController::update_camera() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt());
+    }
+    if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt());
+    }
+    if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt());
+    }
+    if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt());
+    }
+
+    auto observer = std::make_unique<MainPlatformEventObserver>();
+}
+
+void app::MainController::update() {
+    update_camera();
 }
