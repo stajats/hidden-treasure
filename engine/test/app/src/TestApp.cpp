@@ -9,7 +9,7 @@ void TestApp::app_setup() {
     main_controller->after(core::Controller::get<core::EngineControllersEnd>());
     gui_controller->after(main_controller);
 }
-}// namespace engine::test::app
+}//namespace engine::test::app
 
 int main(int argc, char **argv) {
     return std::make_unique<engine::test::app::TestApp>()->run(argc, argv);
