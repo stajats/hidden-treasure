@@ -4,6 +4,8 @@
 
 #include "../include/MainController.hpp"
 
+#include "../../engine/test/app/include/app/GUIController.hpp"
+#include "GUIController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
 #include "engine/platform/PlatformController.hpp"
@@ -16,6 +18,8 @@ public:
 };
 
 void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
+    auto gui_controller = engine::core::Controller::get<app::GUIController>();
+    if (gui_controller->is_enabled()) return;
     auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
     camera->rotate_camera(position.dx, position.dy);
 }
@@ -63,6 +67,9 @@ void app::MainController::draw() {
     draw_boat();
 }
 void app::MainController::update_camera() {
+    auto gui_controller = engine::core::Controller::get<app::GUIController>();
+    if (gui_controller->is_enabled()) return;
+    
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
