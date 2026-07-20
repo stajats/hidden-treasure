@@ -1,6 +1,9 @@
 {
   "resources": {
     "models": {
+      "boat": {
+        "path": "boat/boat.obj"
+      }
     }
   },
   "window": {
