@@ -3,6 +3,9 @@
     "models": {
       "boat": {
         "path": "boat/boat.obj"
+      },
+      "island": {
+        "path": "island/1220 Island.obj"
       }
     }
   },
