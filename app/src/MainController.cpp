@@ -53,11 +53,87 @@ void app::MainController::draw_boat() {
     auto boat = resources->model("boat");
     auto shader = resources->shader("basic");
     shader->use();
+    glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f));
+
+    glm::vec3 ambient = glm::vec3(0.15f);
+    glm::vec3 specular = glm::vec3(0.2f, 0.2f, 0.2f);
+    float shininess = 20.0f;
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("materialAmbient", ambient);
+    shader->set_vec3("materialSpecular", specular);
+    shader->set_float("materialShininess", shininess);
+
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
     glm::mat4 model = glm::mat4(1.0f);
     model = translate(model, glm::vec3(0.0f, 0.0f, -3.0f));
     model = scale(model, glm::vec3(0.3));
+    shader->set_mat4("model", model);
+
+    boat->draw(shader);
+}
+
+void app::MainController::draw_water() {
+
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto boat = resources->model("water");
+    auto shader = resources->shader("water");
+
+    shader->use();
+    glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f));
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 ambient = glm::vec3(0.15f);
+    glm::vec3 specular = glm::vec3(0.8f, 0.8f, 0.8f);
+    float shininess = 64.0f;
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("lightColor", lightColor);
+    shader->set_vec3("materialAmbient", ambient);
+    shader->set_vec3("materialSpecular", specular);
+    shader->set_float("materialShininess", shininess);
+
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+    model = scale(model, glm::vec3(100.0f));
+    shader->set_mat4("model", model);
+
+    boat->draw(shader);
+}
+void app::MainController::draw_island() {
+
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto boat = resources->model("island");
+    auto shader = resources->shader("basic");
+
+    shader->use();
+    glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f));
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 ambient = glm::vec3(0.15f);
+    glm::vec3 specular = glm::vec3(0.2f, 0.2f, 0.2f);
+    float shininess = 20.0f;
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("lightColor", lightColor);
+    shader->set_vec3("materialAmbient", ambient);
+    shader->set_vec3("materialSpecular", specular);
+    shader->set_float("materialShininess", shininess);
+
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = translate(model, glm::vec3(0.0f, -0.2f, 10.0f));
+    model = scale(model, glm::vec3(0.09));
     shader->set_mat4("model", model);
 
     boat->draw(shader);
@@ -74,12 +150,14 @@ void app::MainController::draw_skybox() {
 void app::MainController::draw() {
 
     draw_boat();
+    draw_water();
+    draw_island();
     draw_skybox();
 }
 void app::MainController::update_camera() {
     auto gui_controller = engine::core::Controller::get<app::GUIController>();
     if (gui_controller->is_enabled()) return;
-
+    
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {

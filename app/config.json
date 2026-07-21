@@ -2,7 +2,13 @@
   "resources": {
     "models": {
       "boat": {
-        "path": "boat/Boat.obj"
+        "path": "boat/boat.obj"
+      },
+      "island": {
+        "path": "island/1220 Island.obj"
+      },
+      "water": {
+        "path": "water/water.obj"
       }
     }
   },
