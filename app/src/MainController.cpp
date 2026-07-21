@@ -82,7 +82,7 @@ void app::MainController::draw_water() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto boat = resources->model("water");
-    auto shader = resources->shader("basic");
+    auto shader = resources->shader("water");
 
     shader->use();
     glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f));
