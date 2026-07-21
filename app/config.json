@@ -9,6 +9,9 @@
       },
       "water": {
         "path": "water/water.obj"
+      },
+      "chest": {
+        "path": "chest/chest.obj"
       }
     }
   },

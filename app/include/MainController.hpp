@@ -20,6 +20,7 @@ public:
     std::string_view name() const override;
     void draw_boat();
     void draw_skybox();
+    void draw_chest();
     void draw_island();
     void draw_water();
 };
