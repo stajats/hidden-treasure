@@ -2,7 +2,7 @@
   "resources": {
     "models": {
       "boat": {
-        "path": "boat/boat.obj"
+        "path": "boat/Boat.obj"
       }
     }
   },
