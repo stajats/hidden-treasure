@@ -41,8 +41,6 @@ uniform vec3 lightColor;
 uniform vec3 lightDir;
 
 void main() {
-    vec3 lightColor = vec3(1.0f, 0.8f, 0.8f);
-
     //ambient
     vec3 ambient = materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
 
