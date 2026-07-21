@@ -53,6 +53,8 @@ void app::MainController::draw_boat() {
     auto boat = resources->model("boat");
     auto shader = resources->shader("basic");
     shader->use();
+    glm::vec3 lightDir(-0.3f, -0.9f, -0.95f);
+    shader->set_vec3("lightDir", lightDir);
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model = glm::mat4(1.0f);
