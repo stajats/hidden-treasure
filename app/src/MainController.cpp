@@ -62,14 +62,24 @@ void app::MainController::draw_boat() {
 
     boat->draw(shader);
 }
+void app::MainController::draw_skybox() {
+
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto skybox = resources->skybox("nightsky");
+    auto shader = resources->shader("skybox");
+    graphics->draw_skybox(shader, skybox);
+}
+
 void app::MainController::draw() {
 
     draw_boat();
+    draw_skybox();
 }
 void app::MainController::update_camera() {
     auto gui_controller = engine::core::Controller::get<app::GUIController>();
     if (gui_controller->is_enabled()) return;
-    
+
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {

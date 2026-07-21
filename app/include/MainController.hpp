@@ -19,6 +19,7 @@ class MainController : public engine::core::Controller {
 public:
     std::string_view name() const override;
     void draw_boat();
+    void draw_skybox();
 };
 
 }// namespace app
