@@ -5,6 +5,7 @@
 #ifndef MATF_RG_PROJECT_MAINCONTROLLER_HPP
 #define MATF_RG_PROJECT_MAINCONTROLLER_HPP
 #include "engine/core/Controller.hpp"
+#include "glm/vec3.hpp"
 
 namespace app {
 class MainController : public engine::core::Controller {
@@ -17,6 +18,32 @@ class MainController : public engine::core::Controller {
     void update() override;
 
 public:
+    struct Transform
+    {
+        glm::vec3 translation;
+        float radians;
+        glm::vec3 rotation;
+        glm::vec3 scale;
+    };
+
+    struct Material
+    {
+        float ambient;
+        glm::vec3 specular;
+        float shininess;
+    };
+
+    struct DirectionalLight
+    {
+        glm::vec3 direction;
+        glm::vec3 color;
+    };
+
+    struct Resource
+    {
+        std::string model_name;
+        std::string shader_name;
+    };
     std::string_view name() const override;
     void draw_boat();
     void draw_skybox();
