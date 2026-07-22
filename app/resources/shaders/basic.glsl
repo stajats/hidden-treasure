@@ -30,7 +30,7 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
-uniform vec3 materialAmbient;
+uniform float materialAmbient;
 uniform vec3 materialSpecular;
 uniform float materialShininess;
 
