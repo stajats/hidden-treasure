@@ -45,6 +45,7 @@ public:
         std::string shader_name;
     };
     std::string_view name() const override;
+    void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
     void draw_boat();
     void draw_skybox();
     void draw_chest();

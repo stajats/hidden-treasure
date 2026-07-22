@@ -220,9 +220,42 @@ void app::MainController::draw_rock() {
 
     boat->draw(shader);
 }
+void app::MainController::draw_basic(Resource r, Transform t, Material m, DirectionalLight dl) {
+
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto mesh = resources->model(r.model_name);
+    auto shader = resources->shader(r.shader_name);
+    shader->use();
+
+    shader->set_vec3("lightDir", dl.direction);
+    shader->set_vec3("lightColor", dl.color);
+    shader->set_float("materialAmbient", m.ambient);
+    shader->set_vec3("materialSpecular", m.specular);
+    shader->set_float("materialShininess", m.shininess);
+
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = translate(model, t.translation);
+    model = rotate(model, t.radians, t.rotation);
+    model = scale(model, t.scale);
+
+    shader->set_mat4("model", model);
+
+    mesh->draw(shader);
+}
 void app::MainController::draw() {
 
-    draw_boat();
+    auto sunLight = DirectionalLight(glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f)), glm::vec3(1.0f, 1.0f, 1.0f));
+    draw_basic(Resource("boat", "basic"),
+               Transform(glm::vec3(0.0f, 0.0f, -3.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.3f)),
+               Material(0.15f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+               sunLight);
+
     draw_rock();
     draw_water();
     draw_island();
