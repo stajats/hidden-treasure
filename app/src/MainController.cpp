@@ -187,10 +187,43 @@ void app::MainController::draw_chest() {
 
     boat->draw(shader);
 }
+void app::MainController::draw_rock() {
 
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto boat = resources->model("rock");
+    auto shader = resources->shader("basic");
+    shader->use();
+    glm::vec3 lightDir = glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f));
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    glm::vec3 ambient = glm::vec3(0.15f);
+    glm::vec3 specular = glm::vec3(0.2f, 0.2f, 0.2f);
+    float shininess = 20.0f;
+
+    shader->set_vec3("lightDir", lightDir);
+    shader->set_vec3("lightColor", lightColor);
+    shader->set_vec3("materialAmbient", ambient);
+    shader->set_vec3("materialSpecular", specular);
+    shader->set_float("materialShininess", shininess);
+
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("viewPos", graphics->camera()->Position);
+
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = translate(model, glm::vec3(-1.6f, 1.15f, 5.5f));
+    model = rotate(model, glm::radians(-220.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = scale(model, glm::vec3(10.15));
+
+    shader->set_mat4("model", model);
+
+    boat->draw(shader);
+}
 void app::MainController::draw() {
 
     draw_boat();
+    draw_rock();
     draw_water();
     draw_island();
     draw_skybox();

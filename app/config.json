@@ -12,6 +12,9 @@
       },
       "chest": {
         "path": "chest/chest.obj"
+      },
+      "rock": {
+        "path": "rock/rock.obj"
       }
     }
   },

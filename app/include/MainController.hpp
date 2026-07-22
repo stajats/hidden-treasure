@@ -21,6 +21,7 @@ public:
     void draw_boat();
     void draw_skybox();
     void draw_chest();
+    void draw_rock();
     void draw_island();
     void draw_water();
 };
