@@ -15,6 +15,12 @@
       },
       "rock": {
         "path": "rock/rock.obj"
+      },
+      "rock1": {
+        "path": "rock1/rock1.obj"
+      },
+      "rocks": {
+        "path": "rocks/rocks.obj"
       }
     }
   },

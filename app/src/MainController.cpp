@@ -91,20 +91,64 @@ void app::MainController::draw() {
                Transform(glm::vec3(0.0f, 0.0f, -3.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.3f)),
                Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
                sunLight);
-    draw_basic(Resource("rock", "basic"),
-               Transform(glm::vec3(-1.6f, 1.15f, 5.5f), -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(10.15f)),
-               Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
-               sunLight);
+    for (int i = 0; i < 8; i++) {
+        std::vector<glm::vec3> translations = {
+            glm::vec3(-5.0f,0.0f, 10.5f),
+            glm::vec3( 3.83f, 0.0f,  9.48f),
+            glm::vec3( 9.24f, 0.0f, 15.69f),
+            glm::vec3(10.81f, 0.0f, 23.93f),
+            glm::vec3( 5.30f, 0.0f, 28.48f),
+            glm::vec3(-4.12f, 0.0f, 30.20f),
+            glm::vec3(-9.01f, 0.0f, 25.20f),
+            glm::vec3(-10.53f, 0.0f, 17.18f),
+        };
+        draw_basic(Resource("rock", "basic"),
+                   Transform(translations[i], -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(15.0f, 25.0f, 15.0f)),
+                   Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+                   sunLight);
+    }
+    for (int i = 0; i < 8; i++) {
+        std::vector<glm::vec3> translations = {
+            glm::vec3(-10.80f, 0.0f,  0.40f ),
+            glm::vec3(  7.20f, 0.0f, -1.80f ),
+            glm::vec3( 18.90f, 0.0f, 11.10f ),
+            glm::vec3( 21.40f, 0.0f, 27.60f ),
+            glm::vec3( 11.10f, 0.0f, 37.10f ),
+            glm::vec3( -8.90f, 0.0f, 40.50f ),
+            glm::vec3(-18.60f, 0.0f, 30.80f ),
+            glm::vec3(-21.20f, 0.0f, 14.10f ),
+        };
+        draw_basic(Resource("rock1", "basic"),
+                   Transform(translations[i], -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(15.0f, 25.0f, 15.0f)),
+                   Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+                   sunLight);
+    }
+    for (int i = 0; i < 8; i++) {
+        std::vector<glm::vec3> translations = {
+            glm::vec3( -2.35f, -0.1f, 15.60f ),
+            glm::vec3(  1.70f, -0.1f, 14.90f ),
+            glm::vec3(  4.80f, -0.1f, 17.70f ),
+            glm::vec3(  5.20f, -0.1f, 22.10f ),
+            glm::vec3(  2.40f, -0.1f, 24.30f ),
+            glm::vec3( -1.90f, -0.1f, 24.80f ),
+            glm::vec3( -4.40f, -0.1f, 22.40f ),
+            glm::vec3( -5.10f, -0.1f, 18.70f ),
+        };
+        draw_basic(Resource("rocks", "basic"),
+                   Transform(translations[i], -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f, 4.0f, 4.0f)),
+                   Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+                   sunLight);
+    }
     draw_basic(Resource("island", "basic"),
-              Transform(glm::vec3(0.0f, -0.3f, 20.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.09f)),
+              Transform(glm::vec3(0.0f, -0.21f, 20.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.09f)),
               Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
               sunLight);
     draw_basic(Resource("chest", "basic"),
-              Transform(glm::vec3(-1.6f, 1.15f, 20.5f), -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.15f)),
+              Transform(glm::vec3(-1.6f, 1.15f, 20.5f), -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.2f)),
               Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
               sunLight);
     draw_basic(Resource("water", "water"),
-              Transform(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(100.0f)),
+              Transform(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(500.0f)),
               Material(0.25f, glm::vec3(0.8f, 0.8f, 0.8f), 64.0f),
               sunLight);
     draw_skybox();
