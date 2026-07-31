@@ -114,16 +114,16 @@ void app::MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt());
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt() * 3);
     }
     if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt());
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt() * 3);
     }
     if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt());
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt() * 3);
     }
     if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt());
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 3);
     }
 
     auto observer = std::make_unique<MainPlatformEventObserver>();
