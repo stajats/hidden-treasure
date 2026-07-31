@@ -50,7 +50,7 @@ void app::MainController::draw_skybox() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
-    auto skybox = resources->skybox("nightsky");
+    auto skybox = resources->skybox("sunrise");
     auto shader = resources->shader("skybox");
     graphics->draw_skybox(shader, skybox);
 }
@@ -84,7 +84,9 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 }
 void app::MainController::draw() {
 
-    auto sunLight = DirectionalLight(glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f)), glm::vec3(1.0f, 0.3f, 0.3f));
+    //auto sunLight = DirectionalLight(glm::normalize(glm::vec3(-0.3f, -0.9f, -0.95f)), glm::vec3(1.0f, 1.0f, 1.0f));
+
+   auto sunLight = DirectionalLight(glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)), glm::vec3(1.0f, 1.0f, 1.0f));
     draw_basic(Resource("boat", "basic"),
                Transform(glm::vec3(0.0f, 0.0f, -3.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.3f)),
                Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
