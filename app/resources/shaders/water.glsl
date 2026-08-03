@@ -40,11 +40,20 @@ uniform sampler2D texture_diffuse1;
 uniform vec3 lightColor;
 uniform vec3 lightDir;
 
+struct SpotLight {
+    vec3  position;
+    vec3  direction;
+    float cutOff;
+    float outerCutOff;
 
-void main() {
+    float constant;
+    float linear;
+    float quadratic;
+};
 
-    //ambient
-    vec3 ambient = materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
+uniform SpotLight light;
+
+vec3 calculateDiretionalLight() {
 
     // diffuse
     vec3 norm = normalize(Normal);
@@ -57,7 +66,48 @@ void main() {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
     vec3 specular = lightColor * (spec * materialSpecular);
 
-    vec3 result = ambient + diffuse + specular;
+    return diffuse + specular;
+}
+
+vec3 calculateSpotLight() {
+
+    vec3 spotLightColor = vec3(1.0f, 1.0f, 1.0f);
+    //diffuse
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(light.position - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = spotLightColor * diff * texture(texture_diffuse1, TexCoords).rgb;
+
+    // specular
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+    vec3 specular = spotLightColor * spec * materialSpecular;
+
+    // spotlight
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = (light.cutOff - light.outerCutOff);
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+    diffuse *= intensity;
+    specular *= intensity;
+
+    // attenuation
+    float distance = length(light.position - FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+    diffuse *= attenuation;
+    specular *= attenuation;
+    return diffuse + specular;
+}
+void main() {
+    //ambient
+
+    vec3 result = vec3(0.0f);
+
+    result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
+    result += calculateDiretionalLight();
+    result += calculateSpotLight();
 
     FragColor = vec4(result, 1.0);
 }
+

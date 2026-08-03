@@ -168,6 +168,14 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto shader = resources->shader(r.shader_name);
     shader->use();
 
+    shader->set_float("light.constant",  1.0f);
+    shader->set_float("light.linear",    0.09f);
+    shader->set_float("light.quadratic", 0.032f);
+    shader->set_vec3("light.position",  graphics->camera()->Position);
+    shader->set_vec3("light.direction", graphics->camera()->Front);
+
+    shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
+    shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
     shader->set_vec3("lightDir", dl.direction);
     shader->set_vec3("lightColor", dl.color);
     shader->set_float("materialAmbient", m.ambient);
