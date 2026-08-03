@@ -50,7 +50,17 @@ struct SpotLight {
     float linear;
     float quadratic;
 };
+struct PointLight {
+    vec3 position;
+    vec3 color;
 
+    float constant;
+    float linear;
+    float quadratic;
+};
+#define MAX_LIGHT_SOURCES 32
+uniform int num_of_light_sources;
+uniform PointLight lights[MAX_LIGHT_SOURCES];
 uniform SpotLight light;
 
 vec3 calculateDiretionalLight() {
@@ -99,13 +109,36 @@ vec3 calculateSpotLight() {
     specular *= attenuation;
     return diffuse + specular;
 }
+vec3 calculatePointLight(int i) {
+
+    vec3 lightColor = lights[i].color;
+    //diffuse
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lights[i].position - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = lightColor * diff * texture(texture_diffuse1, TexCoords).rgb;
+
+    // specular
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+    vec3 specular = lightColor * spec * materialSpecular;
+
+    // attenuation
+    float distance = length(lights[i].position - FragPos);
+    float attenuation = 1.0 / (lights[i].constant + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
+    diffuse *= attenuation;
+    specular *= attenuation;
+    return diffuse + specular;
+}
 void main() {
-    //ambient
 
     vec3 result = vec3(0.0f);
 
     result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
     result += calculateDiretionalLight();
+    for (int i = 0; i < num_of_light_sources; i++)
+        result += calculatePointLight(i);
     result += calculateSpotLight();
 
     FragColor = vec4(result, 1.0);

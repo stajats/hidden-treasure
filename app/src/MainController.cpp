@@ -55,6 +55,17 @@ void app::MainController::load_scene() {
             );
         }
     };
+    auto add_light_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
+        for (const auto& inst : instances) {
+            this->light_sources.emplace_back(
+                res,
+                Transform(inst.pos, inst.angle, glm::normalize(inst.axis), inst.scale),
+                mat,
+                sunLight
+            );
+        }
+    };
+
 
     this->objects.emplace_back(
         Resource("boat", "basic"),
@@ -117,7 +128,7 @@ void app::MainController::load_scene() {
         { glm::vec3(-24.10f, -0.10f,  6.70f), 150.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) }
     });
 
-    add_instances(Resource("lantern", "basic"), matMetal, {
+    add_light_instances(Resource("lantern", "basic"), matMetal, {
         { glm::vec3(-2.78f, 0.92f, 19.33f),  30.0f, glm::vec3(-0.5f, 0.0f, 1.0f), glm::vec3(0.5f) },
         { glm::vec3( 0.40f, 1.04f, 20.00f),  60.0f, glm::vec3( 0.0f, 1.0f, 0.2f), glm::vec3(0.5f) },
         { glm::vec3(-1.79f, 0.55f, 18.03f),  35.0f, glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.5f) },
@@ -166,8 +177,31 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto mesh = resources->model(r.model_name);
     auto shader = resources->shader(r.shader_name);
+
     shader->use();
 
+    shader->set_int("num_of_light_sources", this->light_sources.size());
+    for (int i = 0; i < this->light_sources.size(); i++) {
+        glm::vec3 localOffset = glm::vec3(0.0f, 0.2f, 0.0f);
+
+        glm::mat4 rotationMatrix = glm::rotate(
+            glm::mat4(1.0f),
+            glm::radians(light_sources[i].transform.radians),
+            light_sources[i].transform.rotation
+        );
+
+        glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(localOffset, 0.0f));
+
+        // 3. Final light position in world space
+        glm::vec3 lightCenterPos = light_sources[i].transform.translation + worldOffset;
+
+        shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
+        shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
+        shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
+    }
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
     shader->set_float("light.quadratic", 0.032f);
