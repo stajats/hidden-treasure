@@ -72,8 +72,8 @@ vec3 calculateDiretionalLight() {
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+    vec3 halfwayDir = normalize(-lightDir + viewDir);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
     vec3 specular = lightColor * (spec * materialSpecular);
 
     return diffuse + specular;
@@ -90,8 +90,8 @@ vec3 calculateSpotLight() {
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
     vec3 specular = spotLightColor * spec * materialSpecular;
 
     // spotlight
@@ -120,8 +120,8 @@ vec3 calculatePointLight(int i) {
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShininess);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
     vec3 specular = lightColor * spec * materialSpecular;
 
     // attenuation

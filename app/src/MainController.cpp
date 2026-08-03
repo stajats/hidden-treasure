@@ -30,13 +30,13 @@ void app::MainController::load_scene() {
 
     auto sunLight = DirectionalLight(
         glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
-        glm::vec3(1.0, 0.6549, 0.149) / 3.0f
+        glm::vec3(1.0, 0.6549, 0.149) / 4.0f
     );
 
-    Material matStone(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
-    Material matWood(0.30f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
-    Material matMetal(0.35f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
-    Material matWater(0.15f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
+    Material matStone(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 10.0f);
+    Material matWood(0.30f, glm::vec3(0.25f, 0.22f, 0.2f), 5.0f);
+    Material matMetal(0.35f, glm::vec3(0.4f, 0.4f, 0.4f), 16.0f);
+    Material matWater(0.15f, glm::vec3(0.8f, 0.9f, 1.0f), 30.0f);
 
     struct InstanceData {
         glm::vec3 pos;
