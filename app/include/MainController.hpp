@@ -9,6 +9,7 @@
 
 namespace app {
 class MainController : public engine::core::Controller {
+    void load_scene();
     void initialize() override;
     bool loop() override;
     void draw() override;
@@ -44,9 +45,17 @@ public:
         std::string model_name;
         std::string shader_name;
     };
+    struct Model {
+        Resource model;
+        Transform transform;
+        Material material;
+        DirectionalLight directional_light;
+    };
     std::string_view name() const override;
     void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
     void draw_skybox();
+    std::vector<Model> objects;
+    std::vector<Model> light_sources;
 };
 
 }// namespace app
