@@ -21,6 +21,9 @@
       },
       "rocks": {
         "path": "rocks/rocks.obj"
+      },
+      "ship": {
+        "path": "ship/ship.obj"
       }
     }
   },

@@ -186,6 +186,10 @@ void app::MainController::draw() {
               Transform(glm::vec3(-1.6f, 1.14f, 20.5f), -220.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.2f)),
               Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
               sunLight);
+    draw_basic(Resource("ship", "basic"),
+              Transform(glm::vec3(5.0f, 0.5f, 2.0f), -240.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f)),
+              Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+              sunLight);
     draw_basic(Resource("water", "water"),
               Transform(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(500.0f)),
               Material(0.25f, glm::vec3(0.8f, 0.8f, 0.8f), 64.0f),
