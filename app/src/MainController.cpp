@@ -30,7 +30,7 @@ void app::MainController::load_scene() {
 
     auto sunLight = DirectionalLight(
         glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
-        glm::vec3(0.5f, 0.5f, 0.5f)
+        glm::vec3(1.0, 0.6549, 0.149) / 3.0f
     );
 
     Material matStone(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
@@ -138,6 +138,9 @@ void app::MainController::load_scene() {
         { glm::vec3(-3.84f, 0.24f, 21.41f),  80.0f, glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.5f) },
         { glm::vec3(-0.69f, 0.91f, 21.80f),  55.0f, glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(0.5f) }
     });
+    for (int i = 0; i < light_sources.size(); i++) {
+        lights.push_back(LightSource(glm::vec3(0.851, 0.114, 0.039), glm::vec3(0.0f, 0.2f, 0.0f)));
+    }
 }
 
 void app::MainController::initialize() {
@@ -182,7 +185,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 
     shader->set_int("num_of_light_sources", this->light_sources.size());
     for (int i = 0; i < this->light_sources.size(); i++) {
-        glm::vec3 localOffset = glm::vec3(0.0f, 0.2f, 0.0f);
+        glm::vec3 localOffset = lights[i].position;
 
         glm::mat4 rotationMatrix = glm::rotate(
             glm::mat4(1.0f),
@@ -196,7 +199,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         glm::vec3 lightCenterPos = light_sources[i].transform.translation + worldOffset;
 
         shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
-        shader->set_vec3("lights[" + std::to_string(i) + "].color", glm::vec3(1.0f, 1.0f, 1.0f));
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", lights[i].color);
 
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);

@@ -51,11 +51,16 @@ public:
         Material material;
         DirectionalLight directional_light;
     };
+    struct LightSource {
+        glm::vec3 color;
+        glm::vec3 position;
+    };
     std::string_view name() const override;
     void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
     void draw_skybox();
     std::vector<Model> objects;
     std::vector<Model> light_sources;
+    std::vector<LightSource> lights;
 };
 
 }// namespace app

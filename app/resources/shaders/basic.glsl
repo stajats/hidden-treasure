@@ -113,8 +113,7 @@ vec3 calculateSpotLight() {
 }
 vec3 calculatePointLight(int i) {
 
-    //vec3 lightColor = lights[i].color;
-    vec3 lightColor = vec3(1.0f);
+    vec3 lightColor = lights[i].color;
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
@@ -132,7 +131,7 @@ vec3 calculatePointLight(int i) {
     float attenuation = 1.0 / (lights[i].constant + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
     diffuse *= attenuation;
     specular *= attenuation;
-    return diffuse + specular ;
+    return diffuse + specular;
 }
 void main() {
 
