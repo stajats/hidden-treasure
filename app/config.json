@@ -24,6 +24,9 @@
       },
       "ship": {
         "path": "ship/ship.obj"
+      },
+      "lantern": {
+        "path": "lantern/lantern.obj"
       }
     }
   },

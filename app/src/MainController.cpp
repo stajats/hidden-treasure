@@ -190,6 +190,42 @@ void app::MainController::draw() {
               Transform(glm::vec3(5.0f, 0.5f, 2.0f), -240.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f)),
               Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
               sunLight);
+    for (int i = 0; i < 8; i++) {
+        std::vector<glm::vec3> translations = {
+            glm::vec3( -2.78f, 0.92f, 19.33f ), //d
+            glm::vec3(  0.4f, 1.04f, 20.00f ),  //d
+            glm::vec3(  -1.79f, 0.55f, 18.03f ), //d
+            glm::vec3(  1.98f, 2.44f, -1.33f ), //d
+            glm::vec3(  7.86f, 2.03f, 5.70f ), //d
+            glm::vec3( 5.24f, 1.52f, 0.035f ), //d
+            glm::vec3( -3.84f, 0.24f, 21.41f ), //d
+            glm::vec3( -0.69f, 0.91f, 21.8f ), //
+        };
+        std::vector<glm::vec3> rotations = {
+            glm::vec3( -0.5f, 0.0f, 1.0f ),
+            glm::vec3( 0.0f, 1.0f, 0.2f ),
+            glm::vec3( -1.0f, 0.0f, 0.0f ),
+            glm::vec3( 0.0f, 1.0f, 0.0f ),
+            glm::vec3( 0.0f, 1.0f, 0.0f ),
+            glm::vec3( 0.0f, 1.0f, 0.0f ),
+            glm::vec3( 1.0f, 0.0f, 0.0f ),
+            glm::vec3( 0.5f, 1.0f, 0.0f ),
+        };
+        std::vector<float> radians = {
+            30.0f,
+            60.0f,
+            35.0f,
+            130.0f,
+            275.0f,
+            330.0f,
+            80.0f,
+            55.0f,
+        };
+        draw_basic(Resource("lantern", "basic"),
+                   Transform(translations[i], radians[i], rotations[i], glm::vec3(0.5f)),
+                   Material(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f),
+                   sunLight);
+    }
     draw_basic(Resource("water", "water"),
               Transform(glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(500.0f)),
               Material(0.25f, glm::vec3(0.8f, 0.8f, 0.8f), 64.0f),
