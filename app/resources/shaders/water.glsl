@@ -30,7 +30,7 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
-uniform vec3 materialAmbient;
+uniform float materialAmbient;
 uniform vec3 materialSpecular;
 uniform float materialShininess;
 
@@ -40,7 +40,9 @@ uniform sampler2D texture_diffuse1;
 uniform vec3 lightColor;
 uniform vec3 lightDir;
 
+
 void main() {
+
     //ambient
     vec3 ambient = materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
 
