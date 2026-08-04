@@ -8,6 +8,7 @@ layout (location = 2) in vec2 aTexCoords;
 out vec2 TexCoords;
 out vec3 Normal;
 out vec3 FragPos;
+out mat3 TNB;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -18,6 +19,15 @@ void main()
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoords = aTexCoords * 200;
+
+    vec3 aTangent = vec3(1.0f, 0.0f, 0.0f);
+    vec3 aBitangent = vec3(0.0f, 1.0f, 0.0f);
+
+    vec3 T = normalize(vec3(model * vec4(aTangent,   0.0)));
+    vec3 B = normalize(vec3(model * vec4(aBitangent, 0.0)));
+    vec3 N = normalize(vec3(model * vec4(aNormal,    0.0)));
+
+    TNB = mat3(T, B, N);
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
 
@@ -29,6 +39,7 @@ out vec4 FragColor;
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
+in mat3 TNB;
 
 uniform float materialAmbient;
 uniform vec3 materialSpecular;
@@ -37,6 +48,8 @@ uniform float materialShininess;
 uniform vec3 viewPos;
 
 uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_normal1;
+
 uniform vec3 lightColor;
 uniform vec3 lightDir;
 
@@ -70,8 +83,11 @@ uniform bool enablePoint;
 
 vec3 calculateDiretionalLight() {
 
+    vec3 normal = texture(texture_normal1, TexCoords).rgb;
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(TNB * normal);
     // diffuse
-    vec3 norm = normalize(Normal);
+    vec3 norm = normalize(normal);
     float diff = max(dot(norm, -lightDir), 0.0);
     vec3 diffuse = lightColor * (diff * texture(texture_diffuse1, TexCoords).rgb);
 
@@ -86,9 +102,13 @@ vec3 calculateDiretionalLight() {
 
 vec3 calculateSpotLight() {
 
+    vec3 normal = texture(texture_normal1, TexCoords).rgb;
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(TNB * normal);
+
     vec3 spotLightColor = vec3(1.0f, 1.0f, 1.0f);
     //diffuse
-    vec3 norm = normalize(Normal);
+    vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = spotLightColor * diff * texture(texture_diffuse1, TexCoords).rgb;
@@ -116,9 +136,13 @@ vec3 calculateSpotLight() {
 }
 vec3 calculatePointLight(int i) {
 
+    vec3 normal = texture(texture_normal1, TexCoords).rgb;
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(TNB * normal);
+
     vec3 lightColor = lights[i].color;
     //diffuse
-    vec3 norm = normalize(Normal);
+    vec3 norm = normalize(normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightColor * diff * texture(texture_diffuse1, TexCoords).rgb;

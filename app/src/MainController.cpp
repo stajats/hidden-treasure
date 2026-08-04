@@ -84,6 +84,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
     }
+
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
     shader->set_float("light.quadratic", 0.032f);
