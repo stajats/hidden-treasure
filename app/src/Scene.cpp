@@ -22,7 +22,7 @@ void Scene::load_scene() {
 
     spot_light_color = glm::vec3(0.5f, 0.5f, 0.5f);
     lanthern_color = glm::vec3(0.851, 0.114, 0.039);
-
+    skull_color = glm::vec3(0.0f, 1.0f, 0.0f);
     sunLight = DirectionalLight(
         glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
         glm::vec3(1.0, 0.6549, 0.149)
@@ -125,8 +125,16 @@ void Scene::load_scene() {
         { glm::vec3(-3.84f, 0.24f, 21.41f),  80.0f, glm::vec3( 1.0f, 0.0f, 0.0f), glm::vec3(0.5f) },
         { glm::vec3(-0.69f, 0.91f, 21.80f),  55.0f, glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(0.5f) }
     });
+
+    add_light_instances(Resource("flame", "basic"), matMetal, {
+        {glm::vec3(-1.941358f, 1.751783f, 20.432997f), 208.294342f, glm::vec3(-0.684907f, -0.419964f, 0.802914f), glm::vec3(0.025f) },
+        {glm::vec3(-2.072591f, 1.710645f, 20.281853f), 143.233948f, glm::vec3(-1.378606f, -0.681398f, 0.062815f), glm::vec3(0.03f) },
+    });
     for (int i = 0; i < light_sources.size(); i++) {
         lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
     }
+    lights.push_back(LightSource(skull_color, glm::vec3(-1.941358f, 1.751783f, 20.432997f)));
+    lights.push_back(LightSource(skull_color, glm::vec3(-2.072591f, 1.710645f, 20.281853f)));
+
 }
 } // app

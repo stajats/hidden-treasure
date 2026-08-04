@@ -55,6 +55,7 @@ public:
     DirectionalLight sunLight;
     glm::vec3 lanthern_color;
     glm::vec3 spot_light_color;
+    glm::vec3 skull_color;
 
     bool ambient_light;
     bool directional_light;

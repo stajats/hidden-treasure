@@ -27,6 +27,9 @@
       },
       "lantern": {
         "path": "lantern/lantern.obj"
+      },
+      "flame": {
+        "path": "flame/Flame.obj"
       }
     }
   },

@@ -53,8 +53,8 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto shader = resources->shader(r.shader_name);
 
     shader->use();
-    shader->set_int("num_of_light_sources", this->scene.light_sources.size());
-    for (int i = 0; i < this->scene.light_sources.size(); i++) {
+    shader->set_int("num_of_light_sources", this->scene.lights.size());
+    for (int i = 0; i < this->scene.lights.size() - 2; i++) {
         glm::vec3 localOffset = scene.lights[i].position;
 
         glm::mat4 rotationMatrix = glm::rotate(
@@ -75,7 +75,14 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
     }
+    for (int i = this->scene.lights.size() - 2; i < this->scene.lights.size(); i++) {
 
+        shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.lights[i].position);
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lights[i].color);
+        shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
+        shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
+        shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
+    }
     shader->set_float("currentTime", glfwGetTime());
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
@@ -142,7 +149,6 @@ void app::MainController::update_camera() {
     if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
         graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 5);
     }
-
     auto observer = std::make_unique<MainPlatformEventObserver>();
 }
 
