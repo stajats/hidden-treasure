@@ -79,7 +79,8 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         glm::vec3 lightCenterPos = scene.light_sources[i].transform.translation + worldOffset;
 
         shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
-        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lights[i].color);
+        float time = glfwGetTime();
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
 
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
