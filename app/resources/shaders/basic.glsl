@@ -65,6 +65,11 @@ uniform int num_of_light_sources;
 uniform PointLight lights[MAX_LIGHT_SOURCES];
 uniform SpotLight light;
 
+uniform bool enableAmbient;
+uniform bool enableDirectional;
+uniform bool enableSpot;
+uniform bool enablePoint;
+
 vec3 calculateDiretionalLight() {
 
     // diffuse
@@ -136,13 +141,15 @@ vec3 calculatePointLight(int i) {
 void main() {
 
     vec3 result = vec3(0.0f);
-
-    result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
-    result += calculateDiretionalLight();
-    for (int i = 0; i < num_of_light_sources; i++)
+    if (enableAmbient)
+        result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
+    if (enableDirectional)
+        result += calculateDiretionalLight();
+    if (enablePoint)
+        for (int i = 0; i < num_of_light_sources; i++)
             result += calculatePointLight(i);
-
-    result += calculateSpotLight();
+    if (enableSpot)
+        result += calculateSpotLight();
 
     FragColor = vec4(result, 1.0);
 }

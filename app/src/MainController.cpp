@@ -33,10 +33,10 @@ void app::MainController::load_scene() {
         glm::vec3(1.0, 0.6549, 0.149) / 3.0f
     );
 
-    Material matStone(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
-    Material matWood(0.30f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
-    Material matMetal(0.35f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
-    Material matWater(0.15f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
+    Material matStone(0.15f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
+    Material matWood(0.20f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
+    Material matMetal(0.25f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
+    Material matWater(0.10f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
 
     struct InstanceData {
         glm::vec3 pos;
@@ -147,6 +147,11 @@ void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
+
+    ambient_light = true;
+    directional_light = true;
+    point_light = true;
+    spot_light = true;
     load_scene();
 }
 bool app::MainController::loop() {
@@ -210,6 +215,11 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_float("light.quadratic", 0.032f);
     shader->set_vec3("light.position",  graphics->camera()->Position);
     shader->set_vec3("light.direction", graphics->camera()->Front);
+
+    shader->set_bool("enableAmbient", ambient_light);
+    shader->set_bool("enableDirectional", directional_light);
+    shader->set_bool("enablePoint", point_light);
+    shader->set_bool("enableSpot", spot_light);
 
     shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
     shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));

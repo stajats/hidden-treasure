@@ -19,6 +19,11 @@ class MainController : public engine::core::Controller {
     void update() override;
 
 public:
+    bool ambient_light;
+    bool directional_light;
+    bool point_light;
+    bool spot_light;
+
     struct Transform
     {
         glm::vec3 translation;
