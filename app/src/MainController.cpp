@@ -28,15 +28,20 @@ void app::MainController::load_scene() {
     this->objects.clear();
     this->light_sources.clear();
 
+    sun_light_color = glm::vec3(1.0, 0.6549, 0.149) / 3.0f;
+    sun_light_direction = glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f));
+    spot_light_color = glm::vec3(0.5f, 0.5f, 0.5f);
+    lanthern_color = glm::vec3(0.851, 0.114, 0.039);
+
     auto sunLight = DirectionalLight(
         glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
         glm::vec3(1.0, 0.6549, 0.149) / 4.0f
     );
 
-    Material matStone(0.25f, glm::vec3(0.2f, 0.2f, 0.2f), 10.0f);
-    Material matWood(0.30f, glm::vec3(0.25f, 0.22f, 0.2f), 5.0f);
-    Material matMetal(0.35f, glm::vec3(0.4f, 0.4f, 0.4f), 16.0f);
-    Material matWater(0.15f, glm::vec3(0.8f, 0.9f, 1.0f), 30.0f);
+    Material matStone(0.15f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
+    Material matWood(0.20f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
+    Material matMetal(0.25f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
+    Material matWater(0.10f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
 
     struct InstanceData {
         glm::vec3 pos;
@@ -139,7 +144,7 @@ void app::MainController::load_scene() {
         { glm::vec3(-0.69f, 0.91f, 21.80f),  55.0f, glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(0.5f) }
     });
     for (int i = 0; i < light_sources.size(); i++) {
-        lights.push_back(LightSource(glm::vec3(0.851, 0.114, 0.039), glm::vec3(0.0f, 0.2f, 0.0f)));
+        lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
     }
 }
 
@@ -147,6 +152,11 @@ void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
+
+    ambient_light = true;
+    directional_light = true;
+    point_light = true;
+    spot_light = true;
     load_scene();
 }
 bool app::MainController::loop() {
@@ -182,7 +192,6 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto shader = resources->shader(r.shader_name);
 
     shader->use();
-
     shader->set_int("num_of_light_sources", this->light_sources.size());
     for (int i = 0; i < this->light_sources.size(); i++) {
         glm::vec3 localOffset = lights[i].position;
@@ -195,7 +204,6 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 
         glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(localOffset, 0.0f));
 
-        // 3. Final light position in world space
         glm::vec3 lightCenterPos = light_sources[i].transform.translation + worldOffset;
 
         shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
@@ -210,6 +218,12 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_float("light.quadratic", 0.032f);
     shader->set_vec3("light.position",  graphics->camera()->Position);
     shader->set_vec3("light.direction", graphics->camera()->Front);
+    shader->set_vec3("light.color", spot_light_color);
+
+    shader->set_bool("enableAmbient", ambient_light);
+    shader->set_bool("enableDirectional", directional_light);
+    shader->set_bool("enablePoint", point_light);
+    shader->set_bool("enableSpot", spot_light);
 
     shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
     shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
@@ -237,11 +251,11 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 void app::MainController::draw() {
 
     for (auto object: this->objects) {
-        draw_basic(object.model, object.transform, object.material, object.directional_light);
+        draw_basic(object.model, object.transform, object.material, DirectionalLight(sun_light_direction, sun_light_color));
     }
 
     for (auto object: this->light_sources) {
-        draw_basic(object.model, object.transform, object.material, object.directional_light);
+        draw_basic(object.model, object.transform, object.material, DirectionalLight(sun_light_direction, sun_light_color));
     }
     draw_skybox();
 }
