@@ -18,6 +18,7 @@ void Scene::load_scene() {
     directional_light = true;
     point_light = true;
     spot_light = true;
+    animated_water = true;
 
     spot_light_color = glm::vec3(0.5f, 0.5f, 0.5f);
     lanthern_color = glm::vec3(0.851, 0.114, 0.039);

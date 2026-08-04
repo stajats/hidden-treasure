@@ -60,6 +60,7 @@ public:
     bool directional_light;
     bool point_light;
     bool spot_light;
+    bool animated_water;
 
     std::vector<Model> objects;
     std::vector<Model> light_sources;

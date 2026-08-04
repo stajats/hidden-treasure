@@ -54,6 +54,7 @@ uniform vec3 lightColor;
 uniform vec3 lightDir;
 
 struct SpotLight {
+    vec3  color;
     vec3  position;
     vec3  direction;
     float cutOff;
@@ -81,6 +82,7 @@ uniform bool enableAmbient;
 uniform bool enableDirectional;
 uniform bool enableSpot;
 uniform bool enablePoint;
+uniform bool enableAnimated;
 
 void getAnimatedWaterData(out vec3 finalNorm, out vec3 finalTexColor) {
     float speed = 0.3;
@@ -102,10 +104,10 @@ void getAnimatedWaterData(out vec3 finalNorm, out vec3 finalTexColor) {
 }
 vec3 calculateDiretionalLight() {
 
-    vec3 normal;
-    vec3 color;
-
-    getAnimatedWaterData(normal, color);
+    vec3 normal = normalize(TNB * (texture(texture_normal1, TexCoords).rgb * 2.0 - 1.0));
+    vec3 color = texture(texture_diffuse1, TexCoords).rgb;
+    if (enableAnimated)
+        getAnimatedWaterData(normal, color);
     // diffuse
     vec3 norm = normalize(normal);
     float diff = max(dot(norm, -lightDir), 0.0);
@@ -122,11 +124,12 @@ vec3 calculateDiretionalLight() {
 
 vec3 calculateSpotLight() {
 
-    vec3 normal;
-    vec3 color;
-    getAnimatedWaterData(normal, color);
+    vec3 normal = normalize(TNB * (texture(texture_normal1, TexCoords).rgb * 2.0 - 1.0));
+    vec3 color = texture(texture_diffuse1, TexCoords).rgb;
+    if (enableAnimated)
+        getAnimatedWaterData(normal, color);
 
-    vec3 spotLightColor = vec3(1.0f, 1.0f, 1.0f);
+    vec3 spotLightColor = light.color;
     //diffuse
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - FragPos);
@@ -156,9 +159,10 @@ vec3 calculateSpotLight() {
 }
 vec3 calculatePointLight(int i) {
 
-    vec3 normal;
-    vec3 color;
-    getAnimatedWaterData(normal, color);
+    vec3 normal = normalize(TNB * (texture(texture_normal1, TexCoords).rgb * 2.0 - 1.0));
+    vec3 color = texture(texture_diffuse1, TexCoords).rgb;
+    if (enableAnimated)
+        getAnimatedWaterData(normal, color);
 
     vec3 lightColor = lights[i].color;
     //diffuse
@@ -182,9 +186,10 @@ vec3 calculatePointLight(int i) {
 }
 void main() {
 
-    vec3 normal;
-    vec3 color;
-    getAnimatedWaterData(normal, color);
+    vec3 normal = normalize(TNB * (texture(texture_normal1, TexCoords).rgb * 2.0 - 1.0));
+    vec3 color = texture(texture_diffuse1, TexCoords).rgb;
+    if (enableAnimated)
+        getAnimatedWaterData(normal, color);
     vec3 result = vec3(0.0f);
     if (enableAmbient)
         result += materialAmbient * color;

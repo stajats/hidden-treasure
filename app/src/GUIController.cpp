@@ -47,6 +47,9 @@ void GUIController::draw() {
     }
     ImGui::InputFloat3("Spot light", &(main->scene.spot_light_color).x, "%.3f");
     main->scene.spot_light_color = clamp(main->scene.spot_light_color, 0.0f, 1.0f);
+    ImGui::SeparatorText("Animated water");
+    ImGui::Checkbox("Enable animated water", &(main->scene.animated_water));
+
     ImGui::SeparatorText("Performance");
     ImGui::Text("FPS: %.1f (%.3f ms/frame)",
     ImGui::GetIO().Framerate,

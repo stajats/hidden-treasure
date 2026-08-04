@@ -98,6 +98,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_bool("enableDirectional", scene.directional_light);
     shader->set_bool("enablePoint", scene.point_light);
     shader->set_bool("enableSpot", scene.spot_light);
+    shader->set_float("enableAnimated", scene.animated_water);
 
     shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
     shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
