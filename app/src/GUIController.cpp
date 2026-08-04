@@ -32,21 +32,25 @@ void GUIController::draw() {
     ImGui::Text("Camera position: (%f, %f, %f)", camera->Front.x, camera->Front.y, camera->Front.z);
 
     ImGui::SeparatorText("Lighting component switches:");
-    ImGui::Checkbox("Enable ambient light", &(main->ambient_light));
-    ImGui::Checkbox("Enable directional light", &(main->directional_light));
-    ImGui::Checkbox("Enable point light", &(main->point_light));
-    ImGui::Checkbox("Enable spot light", &(main->spot_light));
+    ImGui::Checkbox("Enable ambient light", &(main->scene.ambient_light));
+    ImGui::Checkbox("Enable directional light", &(main->scene.directional_light));
+    ImGui::Checkbox("Enable point light", &(main->scene.point_light));
+    ImGui::Checkbox("Enable spot light", &(main->scene.spot_light));
 
     ImGui::SeparatorText("Lighting color");
-    ImGui::InputFloat3("Sun light", &(main->sun_light_color).x, "%.3f");
-    main->sun_light_color = clamp(main->sun_light_color, 0.0f, 1.0f);
-    ImGui::InputFloat3("Lanthern light", &(main->lanthern_color).x, "%.3f");
-    main->lanthern_color = clamp(main->lanthern_color, 0.0f, 1.0f);
-    for (int i = 0; i < main->lights.size(); i++) {
-        main->lights[i].color = main->lanthern_color;
+    ImGui::InputFloat3("Sun light", &(main->scene.sunLight.color).x, "%.3f");
+    main->scene.sunLight.color = clamp(main->scene.sunLight.color, 0.0f, 1.0f);
+    ImGui::InputFloat3("Lanthern light", &(main->scene.lanthern_color).x, "%.3f");
+    main->scene.lanthern_color = clamp(main->scene.lanthern_color, 0.0f, 1.0f);
+    for (int i = 0; i < main->scene.lights.size(); i++) {
+        main->scene.lights[i].color = main->scene.lanthern_color;
     }
-    ImGui::InputFloat3("Spot light", &(main->spot_light_color).x, "%.3f");
-    main->spot_light_color = clamp(main->spot_light_color, 0.0f, 1.0f);
+    ImGui::InputFloat3("Spot light", &(main->scene.spot_light_color).x, "%.3f");
+    main->scene.spot_light_color = clamp(main->scene.spot_light_color, 0.0f, 1.0f);
+    ImGui::SeparatorText("Performance");
+    ImGui::Text("FPS: %.1f (%.3f ms/frame)",
+    ImGui::GetIO().Framerate,
+    1000.0f / ImGui::GetIO().Framerate);
     graphics->end_gui();
 }
 
