@@ -41,6 +41,7 @@ uniform vec3 lightColor;
 uniform vec3 lightDir;
 
 struct SpotLight {
+    vec3  color;
     vec3  position;
     vec3  direction;
     float cutOff;
@@ -88,7 +89,7 @@ vec3 calculateDiretionalLight() {
 
 vec3 calculateSpotLight() {
 
-    vec3 spotLightColor = vec3(1.0f, 1.0f, 1.0f);
+    vec3 spotLightColor = light.color;
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);

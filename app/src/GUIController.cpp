@@ -12,6 +12,7 @@
 
 namespace app {
 
+float a[3];
 void GUIController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     set_enable(false);
@@ -26,18 +27,26 @@ void GUIController::draw() {
 
     graphics->begin_gui();
 
-    ImGui::Begin("Camera info");
+    ImGui::SeparatorText("Camera info");
     ImGui::Text("Camera position: (%f, %f, %f)", camera->Position.x, camera->Position.y, camera->Position.z);
     ImGui::Text("Camera position: (%f, %f, %f)", camera->Front.x, camera->Front.y, camera->Front.z);
 
-    ImGui::Text("Lighting component switches:");
+    ImGui::SeparatorText("Lighting component switches:");
     ImGui::Checkbox("Enable ambient light", &(main->ambient_light));
     ImGui::Checkbox("Enable directional light", &(main->directional_light));
     ImGui::Checkbox("Enable point light", &(main->point_light));
     ImGui::Checkbox("Enable spot light", &(main->spot_light));
 
-    ImGui::End();
-
+    ImGui::SeparatorText("Lighting color");
+    ImGui::InputFloat3("Sun light", &(main->sun_light_color).x, "%.3f");
+    main->sun_light_color = clamp(main->sun_light_color, 0.0f, 1.0f);
+    ImGui::InputFloat3("Lanthern light", &(main->lanthern_color).x, "%.3f");
+    main->lanthern_color = clamp(main->lanthern_color, 0.0f, 1.0f);
+    for (int i = 0; i < main->lights.size(); i++) {
+        main->lights[i].color = main->lanthern_color;
+    }
+    ImGui::InputFloat3("Spot light", &(main->spot_light_color).x, "%.3f");
+    main->spot_light_color = clamp(main->spot_light_color, 0.0f, 1.0f);
     graphics->end_gui();
 }
 

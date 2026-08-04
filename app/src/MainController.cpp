@@ -28,6 +28,11 @@ void app::MainController::load_scene() {
     this->objects.clear();
     this->light_sources.clear();
 
+    sun_light_color = glm::vec3(1.0, 0.6549, 0.149) / 3.0f;
+    sun_light_direction = glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f));
+    spot_light_color = glm::vec3(0.5f, 0.5f, 0.5f);
+    lanthern_color = glm::vec3(0.851, 0.114, 0.039);
+
     auto sunLight = DirectionalLight(
         glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
         glm::vec3(1.0, 0.6549, 0.149) / 3.0f
@@ -139,7 +144,7 @@ void app::MainController::load_scene() {
         { glm::vec3(-0.69f, 0.91f, 21.80f),  55.0f, glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(0.5f) }
     });
     for (int i = 0; i < light_sources.size(); i++) {
-        lights.push_back(LightSource(glm::vec3(0.851, 0.114, 0.039), glm::vec3(0.0f, 0.2f, 0.0f)));
+        lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
     }
 }
 
@@ -187,7 +192,6 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto shader = resources->shader(r.shader_name);
 
     shader->use();
-
     shader->set_int("num_of_light_sources", this->light_sources.size());
     for (int i = 0; i < this->light_sources.size(); i++) {
         glm::vec3 localOffset = lights[i].position;
@@ -200,7 +204,6 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 
         glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(localOffset, 0.0f));
 
-        // 3. Final light position in world space
         glm::vec3 lightCenterPos = light_sources[i].transform.translation + worldOffset;
 
         shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
@@ -215,6 +218,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_float("light.quadratic", 0.032f);
     shader->set_vec3("light.position",  graphics->camera()->Position);
     shader->set_vec3("light.direction", graphics->camera()->Front);
+    shader->set_vec3("light.color", spot_light_color);
 
     shader->set_bool("enableAmbient", ambient_light);
     shader->set_bool("enableDirectional", directional_light);
@@ -247,11 +251,11 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 void app::MainController::draw() {
 
     for (auto object: this->objects) {
-        draw_basic(object.model, object.transform, object.material, object.directional_light);
+        draw_basic(object.model, object.transform, object.material, DirectionalLight(sun_light_direction, sun_light_color));
     }
 
     for (auto object: this->light_sources) {
-        draw_basic(object.model, object.transform, object.material, object.directional_light);
+        draw_basic(object.model, object.transform, object.material, DirectionalLight(sun_light_direction, sun_light_color));
     }
     draw_skybox();
 }
