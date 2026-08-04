@@ -11,8 +11,10 @@ namespace app {
 void Scene::load_scene() {
 
     this->objects.clear();
-    this->light_sources.clear();
-
+    this->lantern.clear();
+    this->lantern_lights.clear();
+    this->flame.clear();
+    this->flame_lights.clear();
 
     ambient_light = true;
     directional_light = true;
@@ -40,7 +42,7 @@ void Scene::load_scene() {
         glm::vec3 scale;
     };
 
-    auto add_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
+    auto add_object_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
         for (const auto& inst : instances) {
             this->objects.emplace_back(
                 res,
@@ -49,15 +51,25 @@ void Scene::load_scene() {
             );
         }
     };
-    auto add_light_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
+    auto add_lantern_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
         for (const auto& inst : instances) {
-            this->light_sources.emplace_back(
+            this->lantern.emplace_back(
                 res,
                 Transform(inst.pos, inst.angle, glm::normalize(inst.axis), inst.scale),
                 mat
             );
         }
     };
+    auto add_flame_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances) {
+        for (const auto& inst : instances) {
+            this->flame.emplace_back(
+                res,
+                Transform(inst.pos, inst.angle, glm::normalize(inst.axis), inst.scale),
+                mat
+            );
+        }
+    };
+
 
     this->objects.emplace_back(
         Resource("boat", "basic"),
@@ -89,7 +101,7 @@ void Scene::load_scene() {
         matWater
     );
 
-    add_instances(Resource("rock", "basic"), matStone, {
+    add_object_instances(Resource("rock", "basic"), matStone, {
         { glm::vec3( 13.00f,  0.0f, 44.50f),  10.0f, glm::vec3(-1.0f, 0.0f, 1.0f), glm::vec3(15.0f, 25.0f, 15.0f) },
         { glm::vec3(-25.83f, -1.0f, 23.48f), -25.0f, glm::vec3( 1.0f, 0.5f, 1.0f), glm::vec3(15.0f, 25.0f, 15.0f) },
         { glm::vec3(  0.24f, -3.0f, 30.69f), 120.0f, glm::vec3( 0.0f, 1.0f, 0.0f), glm::vec3(15.0f, 25.0f, 15.0f) },
@@ -97,14 +109,14 @@ void Scene::load_scene() {
         { glm::vec3( 15.12f, -0.7f,  2.20f),  30.0f, glm::vec3( 0.0f, 1.0f, 1.0f), glm::vec3(15.0f, 25.0f, 15.0f) }
     });
 
-    add_instances(Resource("rock1", "basic"), matStone, {
+    add_object_instances(Resource("rock1", "basic"), matStone, {
         { glm::vec3( 11.80f, -1.0f, 28.40f),  15.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(  0.00f, -0.5f, 40.50f),  60.0f, glm::vec3(0.01f, 1.0f, 0.02f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(-15.60f, -5.0f, 31.80f), -10.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(-24.20f, -2.0f, 11.00f),   5.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) }
     });
 
-    add_instances(Resource("rocks", "basic"), matStone, {
+    add_object_instances(Resource("rocks", "basic"), matStone, {
         { glm::vec3(  4.00f, -0.10f, 37.00f),  30.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },
         { glm::vec3( 17.70f, -0.10f, 17.90f),  60.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },
         { glm::vec3( -3.80f, -0.10f, 34.70f),  75.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },
@@ -115,7 +127,7 @@ void Scene::load_scene() {
         { glm::vec3(-24.10f, -0.10f,  6.70f), 150.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) }
     });
 
-    add_light_instances(Resource("lantern", "basic"), matMetal, {
+    add_lantern_instances(Resource("lantern", "basic"), matMetal, {
         { glm::vec3(-2.78f, 0.92f, 19.33f),  30.0f, glm::vec3(-0.5f, 0.0f, 1.0f), glm::vec3(0.5f) },
         { glm::vec3( 0.40f, 1.04f, 20.00f),  60.0f, glm::vec3( 0.0f, 1.0f, 0.2f), glm::vec3(0.5f) },
         { glm::vec3(-1.79f, 0.55f, 18.03f),  35.0f, glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.5f) },
@@ -126,15 +138,14 @@ void Scene::load_scene() {
         { glm::vec3(-0.69f, 0.91f, 21.80f),  55.0f, glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(0.5f) }
     });
 
-    add_light_instances(Resource("flame", "basic"), matMetal, {
+    add_flame_instances(Resource("flame", "basic"), matMetal, {
         {glm::vec3(-1.941358f, 1.751783f, 20.432997f), 208.294342f, glm::vec3(-0.684907f, -0.419964f, 0.802914f), glm::vec3(0.025f) },
         {glm::vec3(-2.072591f, 1.710645f, 20.281853f), 143.233948f, glm::vec3(-1.378606f, -0.681398f, 0.062815f), glm::vec3(0.03f) },
     });
-    for (int i = 0; i < light_sources.size(); i++) {
-        lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
+    for (int i = 0; i < lantern.size(); i++) {
+        lantern_lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
     }
-    lights.push_back(LightSource(skull_color, glm::vec3(-1.941358f, 1.751783f, 20.432997f)));
-    lights.push_back(LightSource(skull_color, glm::vec3(-2.072591f, 1.710645f, 20.281853f)));
-
+    flame_lights.push_back(LightSource(skull_color, glm::vec3(-1.941358f, 1.751783f, 20.432997f)));
+    flame_lights.push_back(LightSource(skull_color, glm::vec3(-2.072591f, 1.710645f, 20.281853f)));
 }
 } // app

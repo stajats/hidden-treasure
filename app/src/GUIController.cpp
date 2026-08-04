@@ -42,13 +42,13 @@ void GUIController::draw() {
     main->scene.sunLight.color = clamp(main->scene.sunLight.color, 0.0f, 1.0f);
     ImGui::InputFloat3("Lanthern light", &(main->scene.lanthern_color).x, "%.3f");
     main->scene.lanthern_color = clamp(main->scene.lanthern_color, 0.0f, 1.0f);
-    for (int i = 0; i < main->scene.lights.size() - 2; i++) {
-        main->scene.lights[i].color = main->scene.lanthern_color;
+    for (int i = 0; i < main->scene.lantern_lights.size(); i++) {
+        main->scene.lantern_lights[i].color = main->scene.lanthern_color;
     }
     ImGui::InputFloat3("Skull light", &(main->scene.skull_color).x, "%.3f");
     main->scene.skull_color = clamp(main->scene.skull_color, 0.0f, 1.0f);
-    for (int i = main->scene.lights.size() - 2; i < main->scene.lights.size(); i++) {
-        main->scene.lights[i].color = main->scene.skull_color;
+    for (int i = 0; i < main->scene.flame_lights.size(); i++) {
+        main->scene.flame_lights[i].color = main->scene.skull_color;
     }
     ImGui::InputFloat3("Spot light", &(main->scene.spot_light_color).x, "%.3f");
     main->scene.spot_light_color = clamp(main->scene.spot_light_color, 0.0f, 1.0f);

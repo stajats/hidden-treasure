@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME} ${sources} ${headers}
         include/Scene.hpp
         src/MainPlatformEventObserver.cpp
         include/MainPlatformEventObserver.hpp
+        src/SkullController.cpp
+        include/SkullController.hpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE matf-rg-engine)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

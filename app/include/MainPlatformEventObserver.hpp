@@ -12,6 +12,7 @@ namespace app {
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 public:
     void on_mouse_move(engine::platform::MousePosition position) override;
+    void on_key(engine::platform::Key key) override;
 };
 }
 

@@ -64,8 +64,10 @@ public:
     bool animated_water;
 
     std::vector<Model> objects;
-    std::vector<Model> light_sources;
-    std::vector<LightSource> lights;
+    std::vector<Model> lantern;
+    std::vector<LightSource> lantern_lights;
+    std::vector<Model> flame;
+    std::vector<LightSource> flame_lights;
 };
 }// namespace app
 
