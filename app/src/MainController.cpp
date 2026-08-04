@@ -4,6 +4,7 @@
 
 #include "../include/MainController.hpp"
 
+#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "../../engine/test/app/include/app/GUIController.hpp"
 #include "GUIController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
@@ -85,6 +86,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
     }
 
+    shader->set_float("currentTime", glfwGetTime());
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
     shader->set_float("light.quadratic", 0.032f);

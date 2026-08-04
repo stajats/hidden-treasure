@@ -18,7 +18,7 @@ void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(transpose(inverse(model))) * aNormal;
-    TexCoords = aTexCoords * 200;
+    TexCoords = aTexCoords * 100;
 
     vec3 aTangent = vec3(1.0f, 0.0f, 0.0f);
     vec3 aBitangent = vec3(0.0f, 1.0f, 0.0f);
@@ -75,21 +75,41 @@ struct PointLight {
 uniform int num_of_light_sources;
 uniform PointLight lights[MAX_LIGHT_SOURCES];
 uniform SpotLight light;
+uniform float currentTime;
 
 uniform bool enableAmbient;
 uniform bool enableDirectional;
 uniform bool enableSpot;
 uniform bool enablePoint;
 
+void getAnimatedWaterData(out vec3 finalNorm, out vec3 finalTexColor) {
+    float speed = 0.3;
+
+    vec2 uv1 = TexCoords + vec2(currentTime * speed * 0.1f, currentTime * speed * 0.1f);
+    vec2 uv2 = TexCoords + vec2(-currentTime * speed * 0.1f, currentTime * speed * 0.7 * 0.1f);
+
+    float wave = sin(TexCoords.x * 0.08 + currentTime) * cos(TexCoords.y * 0.08 + currentTime);
+    uv1 += wave * 0.02;
+    uv2 += wave * 0.02;
+
+    finalTexColor = texture(texture_diffuse1, uv1).rgb * 0.5f + texture(texture_diffuse1, uv2).rgb * 0.5f;
+
+    vec3 normalSample1 = texture(texture_normal1, uv1).rgb * 2.0 - 1.0;
+    vec3 normalSample2 = texture(texture_normal1, uv2).rgb * 2.0 - 1.0;
+
+    vec3 localNormal = normalize(normalSample1 + normalSample2);
+    finalNorm = normalize(TNB * localNormal);
+}
 vec3 calculateDiretionalLight() {
 
-    vec3 normal = texture(texture_normal1, TexCoords).rgb;
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(TNB * normal);
+    vec3 normal;
+    vec3 color;
+
+    getAnimatedWaterData(normal, color);
     // diffuse
     vec3 norm = normalize(normal);
     float diff = max(dot(norm, -lightDir), 0.0);
-    vec3 diffuse = lightColor * (diff * texture(texture_diffuse1, TexCoords).rgb);
+    vec3 diffuse = lightColor * (diff * color);
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -102,16 +122,16 @@ vec3 calculateDiretionalLight() {
 
 vec3 calculateSpotLight() {
 
-    vec3 normal = texture(texture_normal1, TexCoords).rgb;
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(TNB * normal);
+    vec3 normal;
+    vec3 color;
+    getAnimatedWaterData(normal, color);
 
     vec3 spotLightColor = vec3(1.0f, 1.0f, 1.0f);
     //diffuse
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = spotLightColor * diff * texture(texture_diffuse1, TexCoords).rgb;
+    vec3 diffuse = spotLightColor * diff * color;
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -136,16 +156,16 @@ vec3 calculateSpotLight() {
 }
 vec3 calculatePointLight(int i) {
 
-    vec3 normal = texture(texture_normal1, TexCoords).rgb;
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(TNB * normal);
+    vec3 normal;
+    vec3 color;
+    getAnimatedWaterData(normal, color);
 
     vec3 lightColor = lights[i].color;
     //diffuse
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = lightColor * diff * texture(texture_diffuse1, TexCoords).rgb;
+    vec3 diffuse = lightColor * diff * color;
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -162,9 +182,12 @@ vec3 calculatePointLight(int i) {
 }
 void main() {
 
+    vec3 normal;
+    vec3 color;
+    getAnimatedWaterData(normal, color);
     vec3 result = vec3(0.0f);
     if (enableAmbient)
-        result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
+        result += materialAmbient * color;
     if (enableDirectional)
         result += calculateDiretionalLight();
     if (enablePoint)
