@@ -14,6 +14,8 @@ add_executable(${PROJECT_NAME} ${sources} ${headers}
         include/GUIController.hpp
         src/Scene.cpp
         include/Scene.hpp
+        src/MainPlatformEventObserver.cpp
+        include/MainPlatformEventObserver.hpp
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE matf-rg-engine)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

@@ -12,18 +12,7 @@
 #include "engine/platform/PlatformController.hpp"
 #include "engine/resources/ResourcesController.hpp"
 #include "spdlog/spdlog.h"
-
-class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
-public:
-    void on_mouse_move(engine::platform::MousePosition position) override;
-};
-
-void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
-    auto gui_controller = engine::core::Controller::get<app::GUIController>();
-    if (gui_controller->is_enabled()) return;
-    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
-    camera->rotate_camera(position.dx, position.dy);
-}
+#include "MainPlatformEventObserver.hpp"
 
 void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
@@ -142,16 +131,16 @@ void app::MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 5);
     }
 
     auto observer = std::make_unique<MainPlatformEventObserver>();
