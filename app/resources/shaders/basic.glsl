@@ -20,7 +20,6 @@ void main()
     TexCoords = aTexCoords;
     gl_Position = projection * view * vec4(FragPos, 1.0);
 }
-
 //#shader fragment
 #version 330 core
 
@@ -61,15 +60,72 @@ struct PointLight {
     float quadratic;
 };
 
-#define MAX_LIGHT_SOURCES 32
+#define MAX_LIGHT_SOURCES 16
 uniform int num_of_light_sources;
 uniform PointLight lights[MAX_LIGHT_SOURCES];
+uniform samplerCube shadow_point_map[MAX_LIGHT_SOURCES];
+
 uniform SpotLight light;
 
 uniform bool enableAmbient;
 uniform bool enableDirectional;
 uniform bool enableSpot;
 uniform bool enablePoint;
+
+float samplePointShadowMap(int index, vec3 direction)
+{
+    float depth = 0.0f;
+    if (index == 0)
+    depth = texture(shadow_point_map[0], direction).r;
+    else if (index == 1)
+    depth = texture(shadow_point_map[1], direction).r;
+    else if (index == 2)
+    depth = texture(shadow_point_map[2], direction).r;
+    else if (index == 3)
+    depth = texture(shadow_point_map[3], direction).r;
+    else if (index == 4)
+    depth = texture(shadow_point_map[4], direction).r;
+    else if (index == 5)
+    depth = texture(shadow_point_map[5], direction).r;
+    else if (index == 6)
+    depth = texture(shadow_point_map[6], direction).r;
+    else if (index == 7)
+    depth = texture(shadow_point_map[7], direction).r;
+    else if (index == 8)
+    depth = texture(shadow_point_map[8], direction).r;
+    else if (index == 9)
+    depth = texture(shadow_point_map[9], direction).r;
+
+    return depth;
+}
+float calculatePointShadow(int i)
+{
+    vec3 sampleOffsetDirections[20] = vec3[](
+        vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
+        vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+        vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+        vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+        vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+    );
+
+    vec3 fragToLight = FragPos - lights[i].position;
+    float currentDepth = length(fragToLight);
+    float bias = 0.15;
+    float shadow = 0.0;
+    int samples = 20;
+    float viewDistance = length(viewPos - FragPos);
+    float diskRadius = 0.05;
+
+    for(int j = 0; j < samples; j++)
+    {
+        float closestDepth = samplePointShadowMap(i, fragToLight + sampleOffsetDirections[j] * diskRadius);
+        closestDepth *= 25.0; // far_plane
+        if(currentDepth - bias > closestDepth)
+        shadow += 1.0;
+    }
+    shadow /= float(samples);
+    return shadow;
+}
 
 vec3 calculateDiretionalLight() {
 
@@ -120,7 +176,7 @@ vec3 calculateSpotLight() {
 vec3 calculatePointLight(int i) {
 
     vec3 lightColor = lights[i].color;
-
+    float shadow = calculatePointShadow(i);
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
@@ -138,7 +194,7 @@ vec3 calculatePointLight(int i) {
     float attenuation = 1.0 / (lights[i].constant + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
     diffuse *= attenuation;
     specular *= attenuation;
-    return diffuse + specular;
+    return (1 - shadow) * (diffuse + specular);
 }
 void main() {
 
