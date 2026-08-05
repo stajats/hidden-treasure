@@ -4,8 +4,9 @@
 
 #ifndef MATF_RG_PROJECT_MAINCONTROLLER_HPP
 #define MATF_RG_PROJECT_MAINCONTROLLER_HPP
-#include "engine/core/Controller.hpp"
 #include "Scene.hpp"
+#include "engine/core/Controller.hpp"
+#include "engine/resources/Shader.hpp"
 
 namespace app {
 class MainController : public engine::core::Controller {
@@ -21,8 +22,6 @@ class MainController : public engine::core::Controller {
 public:
 
     Scene scene;
-    bool skull_lighting = false;
-    float time;
     std::string_view name() const override;
     void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
     void draw_skybox();

@@ -59,6 +59,7 @@ void GUIController::draw() {
     ImGui::Text("FPS: %.1f (%.3f ms/frame)",
     ImGui::GetIO().Framerate,
     1000.0f / ImGui::GetIO().Framerate);
+
     graphics->end_gui();
 }
 

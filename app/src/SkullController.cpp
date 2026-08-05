@@ -26,7 +26,7 @@ void SkullController::draw() {
     auto main = engine::core::Controller::get<MainController>();
     if (is_enabled()) {
         for (auto object : main->scene.flame) {
-            main->draw_basic(object.model, object.transform, object.material, main->scene.sunLight);
+            main->draw_basic(object.resource, object.transform, object.material, main->scene.sunLight);
         }
     }
 }

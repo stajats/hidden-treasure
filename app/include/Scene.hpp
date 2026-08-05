@@ -5,8 +5,6 @@
 #ifndef MATF_RG_PROJECT_SCENE_HPP
 #define MATF_RG_PROJECT_SCENE_HPP
 #include "glm/vec3.hpp"
-
-
 #include <string>
 #include <vector>
 
@@ -15,8 +13,8 @@ namespace app {
 struct Transform
 {
     glm::vec3 translation;
-    float radians;
-    glm::vec3 rotation;
+    float angle;
+    glm::vec3 axis;
     glm::vec3 scale;
 };
 
@@ -38,12 +36,12 @@ struct LightSource {
 };
 struct Resource
 {
-    std::string model_name;
+    std::string model;
     std::string shader_name;
 };
 
 struct Model {
-    Resource model;
+    Resource resource;
     Transform transform;
     Material material;
 };

@@ -108,6 +108,7 @@ vec3 calculateDiretionalLight() {
     vec3 color = texture(texture_diffuse1, TexCoords).rgb;
     if (enableAnimated)
         getAnimatedWaterData(normal, color);
+
     // diffuse
     vec3 norm = normalize(normal);
     float diff = max(dot(norm, -lightDir), 0.0);
@@ -128,8 +129,8 @@ vec3 calculateSpotLight() {
     vec3 color = texture(texture_diffuse1, TexCoords).rgb;
     if (enableAnimated)
         getAnimatedWaterData(normal, color);
-
     vec3 spotLightColor = light.color;
+
     //diffuse
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - FragPos);
@@ -163,8 +164,8 @@ vec3 calculatePointLight(int i) {
     vec3 color = texture(texture_diffuse1, TexCoords).rgb;
     if (enableAnimated)
         getAnimatedWaterData(normal, color);
-
     vec3 lightColor = lights[i].color;
+
     //diffuse
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);

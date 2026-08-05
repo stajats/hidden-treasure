@@ -50,7 +50,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
-    auto mesh = resources->model(r.model_name);
+    auto mesh = resources->model(r.model);
     auto shader = resources->shader(r.shader_name);
     auto skull_controller = engine::core::Controller::get<SkullController>();
 
@@ -62,12 +62,13 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         no_of_light_sources += this->scene.flame_lights.size();
     shader->set_int("num_of_light_sources", no_of_light_sources);
 
+    // lantern lights
     for (int i = 0; i < this->scene.lantern_lights.size(); i++) {
         glm::vec3 localOffset = scene.lantern_lights[i].position;
         glm::mat4 rotationMatrix = glm::rotate(
             glm::mat4(1.0f),
-            glm::radians(scene.lantern[i].transform.radians),
-            scene.lantern[i].transform.rotation
+            glm::radians(scene.lantern[i].transform.angle),
+            scene.lantern[i].transform.axis
         );
         glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(localOffset, 0.0f));
         glm::vec3 lightCenterPos = scene.lantern[i].transform.translation + worldOffset;
@@ -80,6 +81,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
     }
+    //skull lights
     if (skull_controller->is_enabled()) {
         for (int i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
             shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
@@ -90,23 +92,24 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         }
     }
     shader->set_float("currentTime", time);
+    // enable different effects
+    shader->set_bool("enableAmbient", scene.ambient_light);
+    shader->set_bool("enableDirectional", scene.directional_light);
+    shader->set_bool("enablePoint", scene.point_light);
+    shader->set_bool("enableSpot", scene.spot_light);
+    shader->set_float("enableAnimated", scene.animated_water);
+    // spotlight
+    shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
+    shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
+    shader->set_vec3("lightDir", dl.direction);
+    shader->set_vec3("lightColor", dl.color);
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
     shader->set_float("light.quadratic", 0.032f);
     shader->set_vec3("light.position",  graphics->camera()->Position);
     shader->set_vec3("light.direction", graphics->camera()->Front);
     shader->set_vec3("light.color", scene.spot_light_color);
-
-    shader->set_bool("enableAmbient", scene.ambient_light);
-    shader->set_bool("enableDirectional", scene.directional_light);
-    shader->set_bool("enablePoint", scene.point_light);
-    shader->set_bool("enableSpot", scene.spot_light);
-    shader->set_float("enableAnimated", scene.animated_water);
-
-    shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
-    shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
-    shader->set_vec3("lightDir", dl.direction);
-    shader->set_vec3("lightColor", dl.color);
+    // material
     shader->set_float("materialAmbient", m.ambient);
     shader->set_vec3("materialSpecular", m.specular);
     shader->set_float("materialShininess", m.shininess);
@@ -118,7 +121,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     glm::mat4 model = glm::mat4(1.0f);
 
     model = translate(model, t.translation);
-    model = rotate(model, glm::radians(t.radians), t.rotation);
+    model = rotate(model, glm::radians(t.angle), t.axis);
     model = scale(model, t.scale);
 
     shader->set_mat4("model", model);
@@ -129,10 +132,10 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 void app::MainController::draw() {
 
     for (auto object: this->scene.objects) {
-        draw_basic(object.model, object.transform, object.material, scene.sunLight);
+        draw_basic(object.resource, object.transform, object.material, scene.sunLight);
     }
     for (auto object: this->scene.lantern) {
-        draw_basic(object.model, object.transform, object.material, scene.sunLight);
+        draw_basic(object.resource, object.transform, object.material, scene.sunLight);
     }
     draw_skybox();
 }

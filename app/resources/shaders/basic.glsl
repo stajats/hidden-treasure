@@ -73,12 +73,12 @@ uniform bool enablePoint;
 
 vec3 calculateDiretionalLight() {
 
-    // diffuse
+    //diffuese
     vec3 norm = normalize(Normal);
     float diff = max(dot(norm, -lightDir), 0.0);
     vec3 diffuse = lightColor * (diff * texture(texture_diffuse1, TexCoords).rgb);
 
-    // specular
+    //specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 halfwayDir = normalize(-lightDir + viewDir);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
@@ -90,7 +90,7 @@ vec3 calculateDiretionalLight() {
 vec3 calculateSpotLight() {
 
     vec3 spotLightColor = light.color;
-    //diffuse
+    // diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
@@ -120,6 +120,7 @@ vec3 calculateSpotLight() {
 vec3 calculatePointLight(int i) {
 
     vec3 lightColor = lights[i].color;
+
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
