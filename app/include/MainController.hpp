@@ -4,6 +4,7 @@
 
 #ifndef MATF_RG_PROJECT_MAINCONTROLLER_HPP
 #define MATF_RG_PROJECT_MAINCONTROLLER_HPP
+
 #include "Scene.hpp"
 #include "engine/core/Controller.hpp"
 #include "engine/resources/Shader.hpp"

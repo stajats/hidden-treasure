@@ -4,6 +4,7 @@
 
 #ifndef MATF_RG_PROJECT_SCENE_HPP
 #define MATF_RG_PROJECT_SCENE_HPP
+
 #include "glm/vec3.hpp"
 #include <string>
 #include <vector>
@@ -33,6 +34,7 @@ struct DirectionalLight
 struct LightSource {
     glm::vec3 color;
     glm::vec3 position;
+    uint32_t shadow_map_id;
 };
 struct Resource
 {

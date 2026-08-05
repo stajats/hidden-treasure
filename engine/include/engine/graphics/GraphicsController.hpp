@@ -6,6 +6,9 @@
 #ifndef GRAPHICSCONTROLLER_HPP
 #define GRAPHICSCONTROLLER_HPP
 
+#include "engine/resources/PointShadowMap.hpp"
+
+
 #include <engine/core/Controller.hpp>
 #include <engine/graphics/Camera.hpp>
 #include <engine/platform/PlatformEventObserver.hpp>
@@ -85,6 +88,15 @@ public:
     * @brief Draws a @ref resources::Skybox with the @ref resources::Shader.
     */
     void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox);
+    int generate_point_shadow_map(unsigned int size);
+    resources::PointShadowMap *point_shadow_map(int i);
+    void activate_point_shadow(resources::Shader *shader, int index);
+
+    /**
+     * @brief Calculates and binds depth buffer for given lightsource and scene objects
+     */
+    void apply_point_shadow(glm::vec3 position, resources::PointShadowMap *map, std::vector<std::string> &model_names, std::vector<glm::vec3> &translations, std::vector<float> &angle, std::vector<glm::vec3> &axis, std::vector<glm::vec3> &scale);
+
 
     Camera *camera() {
         return &m_camera;
@@ -151,7 +163,7 @@ public:
     */
     const OrthographicMatrixParams &orthographic_params() const {
         return m_ortho_params;
-    }
+    }void print_bound();
 
 private:
     /**
@@ -163,6 +175,11 @@ private:
 
     PerspectiveMatrixParams m_perspective_params{};
     OrthographicMatrixParams m_ortho_params{};
+
+    /**
+     * @breif A hashmap of all the loaded @ref PointShadowMap
+     */
+    std::vector<resources::PointShadowMap> m_point_shadow_maps;
 
     glm::mat4 m_projection_matrix{};
     Camera m_camera{};

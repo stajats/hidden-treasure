@@ -3,7 +3,6 @@
 //
 
 #include "../include/MyApp.hpp"
-
 #include "GUIController.hpp"
 #include "MainController.hpp"
 #include "SkullController.hpp"

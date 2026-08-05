@@ -4,6 +4,7 @@
 
 #ifndef MATF_RG_PROJECT_GUICONTROLLER_HPP
 #define MATF_RG_PROJECT_GUICONTROLLER_HPP
+
 #include "engine/core/Controller.hpp"
 
 namespace app {

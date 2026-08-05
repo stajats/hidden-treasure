@@ -3,8 +3,8 @@
 //
 
 #include "../include/Scene.hpp"
-
-#include "glm/ext/quaternion_geometric.hpp"
+#include "engine/graphics/GraphicsController.hpp"
+#include "spdlog/spdlog.h"
 
 namespace app {
 
@@ -124,7 +124,13 @@ void Scene::load_scene() {
         {glm::vec3(-2.072591f, 1.710645f, 20.281853f), 143.233948f, glm::vec3(-1.378606f, -0.681398f, 0.062815f), glm::vec3(0.03f) },
     }, flame);
     for (int i = 0; i < lantern.size(); i++) {
-        lantern_lights.push_back(LightSource(lanthern_color, glm::vec3(0.0f, 0.2f, 0.0f)));
+        glm::vec3 offset(0.0f, 0.2f, 0.0f); // inside lantern
+
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(lantern[i].transform.angle), lantern[i].transform.axis);
+        glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(offset, 0.0f));
+        glm::vec3 lightCenterPos = lantern[i].transform.translation + worldOffset;
+
+        lantern_lights.push_back(LightSource(lanthern_color, lightCenterPos));
     }
     flame_lights.push_back(LightSource(skull_color, glm::vec3(-1.941358f, 1.751783f, 20.432997f)));
     flame_lights.push_back(LightSource(skull_color, glm::vec3(-2.072591f, 1.710645f, 20.281853f)));
