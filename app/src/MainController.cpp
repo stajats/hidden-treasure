@@ -87,8 +87,8 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
             shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
             shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.flame_lights[i - scene.lantern_lights.size()].color * (float) (sin((time - skull_controller->skull_time) / 2.0f)));
             shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
-            shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
-            shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
+            shader->set_float("lights[" + std::to_string(i) + "].linear",    0.07f);
+            shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.002f);
         }
     }
     shader->set_float("currentTime", time);
