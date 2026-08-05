@@ -4,6 +4,7 @@
 
 #ifndef MATF_RG_PROJECT_SKULLCONTROLLER_HPP
 #define MATF_RG_PROJECT_SKULLCONTROLLER_HPP
+
 #include "engine/core/Controller.hpp"
 
 namespace app {

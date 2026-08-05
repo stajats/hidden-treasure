@@ -7,8 +7,6 @@
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "MainController.hpp"
 
-#include <math.h>
-
 namespace app {
 
 std::string_view app::SkullController::name() const {
