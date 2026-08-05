@@ -71,6 +71,7 @@ uniform bool enableAmbient;
 uniform bool enableDirectional;
 uniform bool enableSpot;
 uniform bool enablePoint;
+uniform bool enablePointShadow;
 
 float samplePointShadowMap(int index, vec3 direction)
 {
@@ -176,7 +177,11 @@ vec3 calculateSpotLight() {
 vec3 calculatePointLight(int i) {
 
     vec3 lightColor = lights[i].color;
-    float shadow = calculatePointShadow(i);
+    float shadow;
+    if (enablePointShadow)
+        shadow = calculatePointShadow(i);
+    else
+        shadow = 0.0f;
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);

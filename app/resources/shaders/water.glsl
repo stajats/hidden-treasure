@@ -84,6 +84,7 @@ uniform bool enableDirectional;
 uniform bool enableSpot;
 uniform bool enablePoint;
 uniform bool enableAnimated;
+uniform bool enablePointShadow;
 
 float samplePointShadowMap(int index, vec3 direction)
 {
@@ -218,7 +219,11 @@ vec3 calculatePointLight(int i) {
 
     vec3 normal = normalize(TNB * (texture(texture_normal1, TexCoords).rgb * 2.0 - 1.0));
     vec3 color = texture(texture_diffuse1, TexCoords).rgb;
-    float shadow = calculatePointShadow(i);
+    float shadow;
+    if (enablePointShadow)
+        shadow = calculatePointShadow(i);
+    else
+        shadow = 0.0f;
 
     if (enableAnimated)
         getAnimatedWaterData(normal, color);

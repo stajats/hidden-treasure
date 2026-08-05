@@ -82,12 +82,13 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
-
-        graphics->activate_point_shadow(shader, i);
+        if (scene.point_shadows)
+            graphics->activate_point_shadow(shader, i);
     }
-    for (int i = this->scene.lantern_lights.size(); i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
-        graphics->activate_point_shadow(shader, i);
-    }
+    if (scene.point_shadows)
+        for (int i = this->scene.lantern_lights.size(); i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
+            graphics->activate_point_shadow(shader, i);
+        }
     if (skull_controller->is_enabled()) {
         for (int i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
             shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
@@ -103,6 +104,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_bool("enableDirectional", scene.directional_light);
     shader->set_bool("enablePoint", scene.point_light);
     shader->set_bool("enableSpot", scene.spot_light);
+    shader->set_bool("enablePointShadow", scene.point_shadows);
     shader->set_float("enableAnimated", scene.animated_water);
     // spotlight
     shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
@@ -149,11 +151,13 @@ void app::MainController::draw() {
         axis[i] = scene.objects[i].transform.axis;
         scale[i] = scene.objects[i].transform.scale;
     }
-    for (auto &object: scene.lantern_lights) {
-        graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
-    }
-    for (auto &object: scene.flame_lights) {
-        graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+    if (scene.point_shadows) {
+        for (auto &object: scene.lantern_lights) {
+            graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+        }
+        for (auto &object: scene.flame_lights) {
+            graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+        }
     }
     for (auto object: this->scene.objects) {
         draw_basic(object.resource, object.transform, object.material, scene.sunLight);

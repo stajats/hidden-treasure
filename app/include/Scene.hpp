@@ -62,6 +62,7 @@ public:
     bool point_light;
     bool spot_light;
     bool animated_water;
+    bool point_shadows;
 
     std::vector<Model> objects;
     std::vector<Model> lantern;
