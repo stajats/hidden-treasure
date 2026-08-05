@@ -21,6 +21,8 @@ class MainController : public engine::core::Controller {
 public:
 
     Scene scene;
+    bool skull_lighting = false;
+    float time;
     std::string_view name() const override;
     void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
     void draw_skybox();

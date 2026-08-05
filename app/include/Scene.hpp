@@ -55,6 +55,7 @@ public:
     DirectionalLight sunLight;
     glm::vec3 lanthern_color;
     glm::vec3 spot_light_color;
+    glm::vec3 skull_color;
 
     bool ambient_light;
     bool directional_light;
@@ -63,8 +64,10 @@ public:
     bool animated_water;
 
     std::vector<Model> objects;
-    std::vector<Model> light_sources;
-    std::vector<LightSource> lights;
+    std::vector<Model> lantern;
+    std::vector<LightSource> lantern_lights;
+    std::vector<Model> flame;
+    std::vector<LightSource> flame_lights;
 };
 }// namespace app
 

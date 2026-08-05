@@ -7,23 +7,13 @@
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "../../engine/test/app/include/app/GUIController.hpp"
 #include "GUIController.hpp"
+#include "MainPlatformEventObserver.hpp"
+#include "SkullController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
 #include "engine/platform/PlatformController.hpp"
 #include "engine/resources/ResourcesController.hpp"
 #include "spdlog/spdlog.h"
-
-class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
-public:
-    void on_mouse_move(engine::platform::MousePosition position) override;
-};
-
-void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
-    auto gui_controller = engine::core::Controller::get<app::GUIController>();
-    if (gui_controller->is_enabled()) return;
-    auto camera = engine::core::Controller::get<engine::graphics::GraphicsController>()->camera();
-    camera->rotate_camera(position.dx, position.dy);
-}
 
 void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
@@ -62,32 +52,44 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto mesh = resources->model(r.model_name);
     auto shader = resources->shader(r.shader_name);
+    auto skull_controller = engine::core::Controller::get<SkullController>();
 
+    float time = glfwGetTime();
     shader->use();
-    shader->set_int("num_of_light_sources", this->scene.light_sources.size());
-    for (int i = 0; i < this->scene.light_sources.size(); i++) {
-        glm::vec3 localOffset = scene.lights[i].position;
 
+    int no_of_light_sources = this->scene.lantern_lights.size();
+    if (skull_controller->is_enabled())
+        no_of_light_sources += this->scene.flame_lights.size();
+    shader->set_int("num_of_light_sources", no_of_light_sources);
+
+    for (int i = 0; i < this->scene.lantern_lights.size(); i++) {
+        glm::vec3 localOffset = scene.lantern_lights[i].position;
         glm::mat4 rotationMatrix = glm::rotate(
             glm::mat4(1.0f),
-            glm::radians(scene.light_sources[i].transform.radians),
-            scene.light_sources[i].transform.rotation
+            glm::radians(scene.lantern[i].transform.radians),
+            scene.lantern[i].transform.rotation
         );
-
         glm::vec3 worldOffset = glm::vec3(rotationMatrix * glm::vec4(localOffset, 0.0f));
-
-        glm::vec3 lightCenterPos = scene.light_sources[i].transform.translation + worldOffset;
+        glm::vec3 lightCenterPos = scene.lantern[i].transform.translation + worldOffset;
 
         shader->set_vec3("lights[" + std::to_string(i) + "].position", lightCenterPos);
-        float time = glfwGetTime();
-        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time * 3 + i), sin(4 * time + i), sin( 5 * time + i)) / 20.0f);
+        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
 
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
     }
-
-    shader->set_float("currentTime", glfwGetTime());
+    if (skull_controller->is_enabled()) {
+        for (int i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
+            shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
+            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.flame_lights[i - scene.lantern_lights.size()].color * (float) (sin((time - skull_controller->skull_time) / 2.0f)));
+            shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
+            shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
+            shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
+        }
+    }
+    shader->set_float("currentTime", time);
     shader->set_float("light.constant",  1.0f);
     shader->set_float("light.linear",    0.09f);
     shader->set_float("light.quadratic", 0.032f);
@@ -129,8 +131,7 @@ void app::MainController::draw() {
     for (auto object: this->scene.objects) {
         draw_basic(object.model, object.transform, object.material, scene.sunLight);
     }
-
-    for (auto object: this->scene.light_sources) {
+    for (auto object: this->scene.lantern) {
         draw_basic(object.model, object.transform, object.material, scene.sunLight);
     }
     draw_skybox();
@@ -142,18 +143,17 @@ void app::MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (platform->key(engine::platform::KeyId::KEY_W).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::FORWARD, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_S).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::BACKWARD, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_A).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::LEFT, platform->dt() * 5);
     }
     if (platform->key(engine::platform::KeyId::KEY_D).is_down()) {
-        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 3);
+        graphics->camera()->move_camera(engine::graphics::Camera::Movement::RIGHT, platform->dt() * 5);
     }
-
     auto observer = std::make_unique<MainPlatformEventObserver>();
 }
 
