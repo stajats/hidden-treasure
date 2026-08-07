@@ -10,6 +10,9 @@ namespace graphics {
 
 RenderTarget::RenderTarget(int width, int height) {
 
+    GLint currentFboId = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
+
     m_width = width;
     m_height = height;
 
@@ -42,10 +45,15 @@ RenderTarget::RenderTarget(int width, int height) {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         throw util::Error("RenderTarget incomplete");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, currentFboId);
 }
 
 RenderTarget::~RenderTarget() {
+
+    GLint currentFboId = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
+    if (currentFboId == this->m_fbo)
+        unbind();
 
     glDeleteFramebuffers(1, &m_fbo);
     glDeleteRenderbuffers(1, &m_depth_stencil);
@@ -73,7 +81,6 @@ void RenderTarget::resize(int width, int height) {
 void RenderTarget::bind() {
     glBindFramebuffer(GL_FRAMEBUFFER,m_fbo);
     glViewport(0, 0, m_width, m_height);
-
 }
 
 void RenderTarget::unbind() {
@@ -81,6 +88,9 @@ void RenderTarget::unbind() {
 }
 
 void RenderTarget::addColorTexture() {
+    GLint currentFboId = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     GLuint texture;
 
@@ -103,7 +113,7 @@ void RenderTarget::addColorTexture() {
         buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
 
     glDrawBuffers(buffers.size(), buffers.data());
-    glBindFramebuffer(GL_FRAMEBUFFER,0);
+    glBindFramebuffer(GL_FRAMEBUFFER, currentFboId);
 }
 } // graphics
 } // engine

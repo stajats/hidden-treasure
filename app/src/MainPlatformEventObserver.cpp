@@ -5,6 +5,7 @@
 #include "../include/MainPlatformEventObserver.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "GUIController.hpp"
+#include "SkullController.hpp"
 #include "engine/platform/PlatformController.hpp"
 
 namespace app {
@@ -18,6 +19,12 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
 
     auto gui_controller = engine::core::Controller::get<GUIController>();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    platform->time();
+    if (gui_controller->is_enabled()) return;
+    auto skull_controller = engine::core::Controller::get<app::SkullController>();
+
+    if (engine::platform::KeyId::KEY_E == key.id()) {
+        skull_controller->set_enable(true);
+        skull_controller->skull_time = platform->time();
+    }
 }
 } // app

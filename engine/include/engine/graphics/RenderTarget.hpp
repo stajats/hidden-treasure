@@ -19,15 +19,35 @@ public:
     RenderTarget() = default;
     RenderTarget(int width, int height);
     ~RenderTarget();
+
+    /**
+      * @brief
+      */
     void addColorTexture();
 
+    /**
+      * @brief
+      */
     void create(int width, int height);
 
+    /**
+      * @brief
+      */
     void resize(int width, int height);
 
+    /**
+      * @brief
+      */
     void bind();
+
+    /**
+      * @brief
+      */
     void unbind();
 
+    /**
+      * @brief
+      */
     GLuint framebuffer() const {
         return m_fbo;
     }
@@ -44,7 +64,7 @@ public:
     int height() const {
         return m_height;
     }
-
+private:
     GLuint m_fbo = 0;
     GLuint m_depth_stencil = 0;
     std::vector<GLuint> m_color_textures;

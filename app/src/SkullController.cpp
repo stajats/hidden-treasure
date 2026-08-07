@@ -8,6 +8,8 @@
 #include "MainController.hpp"
 #include "engine/platform/PlatformController.hpp"
 
+#include <iostream>
+
 namespace app {
 
 std::string_view app::SkullController::name() const {

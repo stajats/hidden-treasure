@@ -4,7 +4,6 @@
 
 #include "../include/MainController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
-#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "../../engine/test/app/include/app/GUIController.hpp"
 #include "GUIController.hpp"
 #include "MainPlatformEventObserver.hpp"
