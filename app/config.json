@@ -5,7 +5,7 @@
         "path": "boat/boat.obj"
       },
       "island": {
-        "path": "island/1220 Island.obj"
+        "path": "island/island.obj"
       },
       "water": {
         "path": "water/water.obj"
@@ -16,11 +16,11 @@
       "rock": {
         "path": "rock/rock.obj"
       },
-      "rock1": {
-        "path": "rock1/rock1.obj"
+      "big_rock": {
+        "path": "big_rock/big_rock.obj"
       },
-      "rocks": {
-        "path": "rocks/rocks.obj"
+      "small_rock": {
+        "path": "small_rock/small_rock.obj"
       },
       "ship": {
         "path": "ship/ship.obj"
@@ -29,13 +29,13 @@
         "path": "lantern/lantern.obj"
       },
       "flame": {
-        "path": "flame/Flame.obj"
+        "path": "flame/flame.obj"
       }
     }
   },
   "window": {
     "height": 600,
-    "title": "Hello, window!",
+    "title": "Hidden treasure",
     "width": 800
   }
 }

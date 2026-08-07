@@ -8,5 +8,5 @@ Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.500000
 illum 1
-map_Kd halloweenbits_texture.png
-map_d halloweenbits_texture.png
+map_Kd diffuse.png
+map_d diffuse.png

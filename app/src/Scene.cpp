@@ -92,14 +92,14 @@ void Scene::load_scene() {
         { glm::vec3( 15.12f, -0.7f,  2.20f),  30.0f, glm::vec3( 0.0f, 1.0f, 1.0f), glm::vec3(15.0f, 25.0f, 15.0f) }
     }, objects);
 
-    add_instances(Resource("rock1", "basic"), matStone, {
+    add_instances(Resource("big_rock", "basic"), matStone, {
         { glm::vec3( 11.80f, -1.0f, 28.40f),  15.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(  0.00f, -0.5f, 40.50f),  60.0f, glm::vec3(0.01f, 1.0f, 0.02f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(-15.60f, -5.0f, 31.80f), -10.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) },
         { glm::vec3(-24.20f, -2.0f, 11.00f),   5.0f, glm::vec3(0.00f, 0.0f, 1.00f), glm::vec3(10.0f, 20.0f, 10.0f) }
     }, objects);
 
-    add_instances(Resource("rocks", "basic"), matStone, {
+    add_instances(Resource("small_rock", "basic"), matStone, {
         { glm::vec3(  4.00f, -0.10f, 37.00f),  30.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },
         { glm::vec3( 17.70f, -0.10f, 17.90f),  60.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },
         { glm::vec3( -3.80f, -0.10f, 34.70f),  75.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(4.0f) },

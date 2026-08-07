@@ -1,6 +1,6 @@
 # Blender 5.2.0 LTS
 # www.blender.org
-mtllib rocks.mtl
+mtllib small_rock.mtl
 o Resource_Rock_3
 v -0.005434 0.012162 -0.206415
 v -0.006601 0.012162 -0.226055
