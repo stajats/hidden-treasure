@@ -3,10 +3,10 @@
 //
 
 #include "../include/MainPlatformEventObserver.hpp"
+#include "engine/graphics/GraphicsController.hpp"
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "GUIController.hpp"
 #include "SkullController.hpp"
-#include "engine/graphics/GraphicsController.hpp"
 #include "engine/platform/PlatformController.hpp"
 
 namespace app {

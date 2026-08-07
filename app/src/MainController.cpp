@@ -3,13 +3,12 @@
 //
 
 #include "../include/MainController.hpp"
-
+#include "engine/graphics/GraphicsController.hpp"
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "../../engine/test/app/include/app/GUIController.hpp"
 #include "GUIController.hpp"
 #include "MainPlatformEventObserver.hpp"
 #include "SkullController.hpp"
-#include "engine/graphics/GraphicsController.hpp"
 #include "engine/graphics/OpenGL.hpp"
 #include "engine/platform/PlatformController.hpp"
 #include "engine/resources/ResourcesController.hpp"

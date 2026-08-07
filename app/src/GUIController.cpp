@@ -2,10 +2,10 @@
 // Created by kaloyan on 7/21/26.
 //
 
+#include "engine/graphics/GraphicsController.hpp"
 #include "../include/GUIController.hpp"
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "MainController.hpp"
-#include "engine/graphics/GraphicsController.hpp"
 #include "engine/platform//PlatformController.hpp"
 #include "imgui.h"
 

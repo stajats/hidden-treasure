@@ -11,5 +11,4 @@ class MyApp : public engine::core::App {
     void app_setup() override;
 };
 
-
 #endif//MATF_RG_PROJECT_MYAPP_HPP

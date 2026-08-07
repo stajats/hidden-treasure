@@ -5,7 +5,9 @@
 
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
+
 #include <engine/util/Utils.hpp>
+#include <iostream>
 
 #include <engine/util/Configuration.hpp>
 #include <spdlog/spdlog.h>

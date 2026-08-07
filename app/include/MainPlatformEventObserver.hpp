@@ -16,6 +16,4 @@ public:
 };
 }
 
-
-
 #endif//MATF_RG_PROJECT_MAINPLATFORMEVENTOBSERVER_HPP

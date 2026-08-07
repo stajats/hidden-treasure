@@ -6,8 +6,6 @@
 #include <engine/graphics/GraphicsController.hpp>
 #include <engine/resources/ResourcesController.hpp>
 
-#include "../../app/include/Scene.hpp"
-
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/Skybox.hpp>
