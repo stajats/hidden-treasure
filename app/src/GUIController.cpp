@@ -52,6 +52,7 @@ void GUIController::draw() {
     ImGui::InputFloat3("Spot light", &(main->scene.spot_light_color).x, "%.3f");
     main->scene.spot_light_color = clamp(main->scene.spot_light_color, 0.0f, 1.0f);
     ImGui::SeparatorText("Visual effects");
+    ImGui::Checkbox("Enable pulsating lantherns", &(main->scene.pulsating_light));
     ImGui::Checkbox("Enable animated water", &(main->scene.animated_water));
     ImGui::Checkbox("Enable point shadows", &(main->scene.point_shadows));
     ImGui::Checkbox("Enable bloom", &(main->scene.enable_bloom));

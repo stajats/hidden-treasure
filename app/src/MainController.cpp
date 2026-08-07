@@ -44,8 +44,6 @@ std::string_view app::MainController::name() const {
     return "app::MainController";
 }
 void app::MainController::begin_draw() {
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::graphics::OpenGL::clear_buffers();
 }
 void app::MainController::end_draw() {
@@ -60,7 +58,6 @@ void app::MainController::draw_skybox() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto skybox = resources->skybox("sunrise");
     auto shader = resources->shader("skybox");
     graphics->draw_skybox(shader, skybox);
@@ -70,7 +67,6 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
 
     auto mesh = resources->model(r.model);
     auto shader = resources->shader(r.shader_name);
@@ -87,23 +83,26 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     // lantern lights
     for (int i = 0; i < this->scene.lantern_lights.size(); i++) {
         shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.lantern_lights[i].position);
-        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time * 3 + i), sin(4 * time + i), sin( 5 * time + i)) / 20.0f);
-        shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
+
+        if (scene.pulsating_light)
+            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
+        else
+            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color);
 
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
         if (scene.point_shadows)
-            graphics->activate_point_shadow(shader, i);
+            graphics->set_point_shadow_map(shader, i);
     }
     if (scene.point_shadows)
-        for (int i = this->scene.lantern_lights.size(); i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
-            graphics->activate_point_shadow(shader, i);
+        for (size_t i = this->scene.lantern_lights.size(); i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
+            graphics->set_point_shadow_map(shader, i);
         }
     if (skull_controller->is_enabled()) {
-        for (int i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
+        for (size_t i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
             shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
-            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.flame_lights[i - scene.lantern_lights.size()].color * (float) (sin((time - skull_controller->skull_time) / 2.0f)));
+            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.flame_lights[i - scene.lantern_lights.size()].color * std::sin((time - skull_controller->skull_time) / 2.0f));
             shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
             shader->set_float("lights[" + std::to_string(i) + "].linear",    0.07f);
             shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.002f);
@@ -137,7 +136,7 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
     shader->set_mat4("view", graphics->camera()->view_matrix());
     shader->set_vec3("viewPos", graphics->camera()->Position);
 
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
 
     model = translate(model, t.translation);
     model = rotate(model, glm::radians(t.angle), t.axis);
@@ -151,7 +150,6 @@ void app::MainController::draw() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     std::vector<std::string> model_names = std::vector<std::string>(scene.objects.size());
     std::vector<glm::vec3> translation = std::vector<glm::vec3>(scene.objects.size());
     std::vector<float> angle = std::vector<float>(scene.objects.size());
@@ -166,17 +164,17 @@ void app::MainController::draw() {
     }
     if (scene.point_shadows) {
         for (auto &object: scene.lantern_lights) {
-            graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
         }
         for (auto &object: scene.flame_lights) {
-            graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
         }
     }
 
-    for (auto object: this->scene.objects) {
+    for (auto &object: this->scene.objects) {
         draw_basic(object.resource, object.transform, object.material, scene.sunLight);
     }
-    for (auto object: this->scene.lantern) {
+    for (auto &object: this->scene.lantern) {
         draw_basic(object.resource, object.transform, object.material, scene.sunLight);
     }
     draw_skybox();

@@ -89,10 +89,10 @@ public:
     /**
     * @brief Draws a @ref resources::Skybox with the @ref resources::Shader.
     */
-    void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox);
+    void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox) const;
     int generate_point_shadow_map(unsigned int size);
     resources::PointShadowMap *point_shadow_map(int i);
-    void activate_point_shadow(resources::Shader *shader, int index);
+    void set_point_shadow_map(const resources::Shader *shader, int index);
 
     void render_quad();
     void bloom(int i);
@@ -103,7 +103,7 @@ public:
     /**
      * @brief Calculates and binds depth buffer for given lightsource and scene objects
      */
-    void apply_point_shadow(glm::vec3 position, resources::PointShadowMap *map, std::vector<std::string> &model_names, std::vector<glm::vec3> &translations, std::vector<float> &angle, std::vector<glm::vec3> &axis, std::vector<glm::vec3> &scale);
+    void draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale) const;
 
 
     Camera *camera() {
@@ -181,7 +181,7 @@ public:
     uint32_t m_final_texture_secondary{};
     void finalize_draw();
 
-    void add_color_texture();
+    void add_color_texture() const;
 private:
     /**
     * @brief Initializes OpenGL, ImGUI, and projection matrix params;
