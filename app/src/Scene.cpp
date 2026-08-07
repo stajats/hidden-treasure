@@ -28,7 +28,7 @@ void Scene::load_scene() {
     lanthern_color = glm::vec3(0.851, 0.114, 0.039);
     skull_color = glm::vec3(0.0f, 1.0f, 0.0f);
     sunLight = DirectionalLight(
-        glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
+        -glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
         glm::vec3(1.0, 0.6549, 0.149)
     );
 

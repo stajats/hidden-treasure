@@ -169,12 +169,12 @@ vec3 calculateDiretionalLight() {
 
     // diffuse
     vec3 norm = normalize(normal);
-    float diff = max(dot(norm, -lightDir), 0.0);
+    float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightColor * (diff * color);
 
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 halfwayDir = normalize(-lightDir + viewDir);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
     vec3 specular = lightColor * (spec * materialSpecular);
 

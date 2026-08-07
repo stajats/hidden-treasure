@@ -133,12 +133,12 @@ vec3 calculateDiretionalLight() {
 
     //diffuese
     vec3 norm = normalize(Normal);
-    float diff = max(dot(norm, -lightDir), 0.0);
+    float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightColor * (diff * texture(texture_diffuse1, TexCoords).rgb);
 
     //specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 halfwayDir = normalize(-lightDir + viewDir);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), materialShininess);
     vec3 specular = lightColor * (spec * materialSpecular);
 
