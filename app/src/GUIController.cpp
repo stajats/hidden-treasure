@@ -54,6 +54,7 @@ void GUIController::draw() {
     ImGui::SeparatorText("Visual effects");
     ImGui::Checkbox("Enable animated water", &(main->scene.animated_water));
     ImGui::Checkbox("Enable point shadows", &(main->scene.point_shadows));
+    ImGui::Checkbox("Enable bloom", &(main->scene.enable_bloom));
 
     ImGui::SeparatorText("Performance");
     ImGui::Text("FPS: %.1f (%.3f ms/frame)",

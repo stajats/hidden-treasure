@@ -16,6 +16,7 @@ void Scene::load_scene() {
     this->flame.clear();
     this->flame_lights.clear();
 
+    enable_bloom = true;
     ambient_light = true;
     directional_light = true;
     point_light = true;
@@ -31,10 +32,10 @@ void Scene::load_scene() {
         glm::vec3(1.0, 0.6549, 0.149)
     );
 
-    Material matStone(0.1f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
-    Material matWood(0.15f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
-    Material matMetal(0.2f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
-    Material matWater(0.15f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
+    Material matStone(0.05f, glm::vec3(0.2f, 0.2f, 0.2f), 20.0f);
+    Material matWood(0.10f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
+    Material matMetal(0.15f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
+    Material matWater(0.10f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
 
     struct InstanceData {
         glm::vec3 pos;

@@ -30,6 +30,8 @@ void app::MainController::initialize() {
     for (auto &light: scene.flame_lights) {
         light.shadow_map_id = graphics->generate_point_shadow_map(1024);
     }
+    graphics->add_color_texture();
+    graphics->add_color_texture();
 }
 bool app::MainController::loop() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
@@ -42,24 +44,34 @@ std::string_view app::MainController::name() const {
     return "app::MainController";
 }
 void app::MainController::begin_draw() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::graphics::OpenGL::clear_buffers();
 }
 void app::MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    if (scene.enable_bloom)
+        graphics->bloom(1);
+    graphics->finalize_draw();
     platform->swap_buffers();
 }
 void app::MainController::draw_skybox() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto skybox = resources->skybox("sunrise");
     auto shader = resources->shader("skybox");
     graphics->draw_skybox(shader, skybox);
+
 }
 void app::MainController::draw_basic(Resource r, Transform t, Material m, DirectionalLight dl) {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
     auto mesh = resources->model(r.model);
     auto shader = resources->shader(r.shader_name);
     auto skull_controller = engine::core::Controller::get<SkullController>();
@@ -136,8 +148,10 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
 }
 
 void app::MainController::draw() {
+
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     std::vector<std::string> model_names = std::vector<std::string>(scene.objects.size());
     std::vector<glm::vec3> translation = std::vector<glm::vec3>(scene.objects.size());
     std::vector<float> angle = std::vector<float>(scene.objects.size());
@@ -158,6 +172,7 @@ void app::MainController::draw() {
             graphics->apply_point_shadow(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
         }
     }
+
     for (auto object: this->scene.objects) {
         draw_basic(object.resource, object.transform, object.material, scene.sunLight);
     }
