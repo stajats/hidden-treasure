@@ -6,6 +6,8 @@
 #ifndef GRAPHICSCONTROLLER_HPP
 #define GRAPHICSCONTROLLER_HPP
 
+#include "Bloom.hpp"
+#include "RenderTarget.hpp"
 #include "engine/resources/PointShadowMap.hpp"
 
 
@@ -92,6 +94,12 @@ public:
     resources::PointShadowMap *point_shadow_map(int i);
     void activate_point_shadow(resources::Shader *shader, int index);
 
+    void render_quad();
+    void bloom(int i);
+
+    unsigned int quadVAO = 0;
+    unsigned int quadVBO;
+
     /**
      * @brief Calculates and binds depth buffer for given lightsource and scene objects
      */
@@ -163,8 +171,17 @@ public:
     */
     const OrthographicMatrixParams &orthographic_params() const {
         return m_ortho_params;
-    }void print_bound();
+    }
 
+    RenderTarget *m_render_target{};
+    RenderTarget *m_render_target_secondary{};
+    Bloom *m_bloom{};
+
+    uint32_t m_final_texture{};
+    uint32_t m_final_texture_secondary{};
+    void finalize_draw();
+
+    void add_color_texture();
 private:
     /**
     * @brief Initializes OpenGL, ImGUI, and projection matrix params;

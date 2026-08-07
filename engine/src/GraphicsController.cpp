@@ -39,6 +39,10 @@ void GraphicsController::initialize() {
     m_ortho_params.Near = 0.1f;
     m_ortho_params.Far = 100.0f;
 
+    m_render_target = new RenderTarget(platform->window()->width(), platform->window()->height());
+    m_render_target_secondary = new RenderTarget(platform->window()->width(), platform->window()->height());
+    m_bloom = nullptr;
+
     platform->register_platform_event_observer(std::make_unique<GraphicsPlatformEventObserver>(this));
     CHECKED_GL_CALL(glViewport, 0, 0, platform->window()->width(), platform->window()->height());
 
@@ -49,6 +53,130 @@ void GraphicsController::initialize() {
     RG_GUARANTEE(ImGui_ImplGlfw_InitForOpenGL(handle, true), "ImGUI failed to initialize for OpenGL");
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
 }
+void GraphicsController::add_color_texture() {
+    m_render_target->addColorTexture();
+    m_render_target_secondary->addColorTexture();
+}
+void GraphicsController::finalize_draw() {
+
+    auto platform =core::Controller::get<platform::PlatformController>();
+    auto resources =core::Controller::get<resources::ResourcesController>();
+
+    int width = platform->window()->width();
+    int height = platform->window()->height();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, width, height);
+
+    auto* shader = resources->shader("final");
+    shader->use();
+    shader->set_int("scene", 0);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_render_target->texture(0));
+
+    glDisable(GL_DEPTH_TEST);
+    render_quad();
+    glEnable(GL_DEPTH_TEST);
+
+    m_render_target->bind();
+}
+
+void GraphicsController::render_quad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+void GraphicsController::bloom(int index) {
+    auto platform = core::Controller::get<platform::PlatformController>();
+    auto resources = engine::core::Controller::get<resources::ResourcesController>();
+
+    int width = platform->window()->width();
+    int height = platform->window()->height();
+
+    if (m_bloom == nullptr)
+        m_bloom = new Bloom(width, height);
+    else
+        m_bloom->resize(width, height);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_bloom->fbo(0));
+    glViewport(0, 0, platform->window()->width(), platform->window()->height());
+
+    bool horizontal = true, first_iteration = true;
+    unsigned int amount = 30;
+
+    auto *blur = resources->shader("blur");
+    blur->use();
+    blur->set_int("image", 0);
+
+    for (int i = 0; i < 10; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER,horizontal ? m_bloom->fbo(0) : m_bloom->fbo(1));
+        blur->set_bool("horizontal", horizontal);
+        glActiveTexture(GL_TEXTURE0);
+
+        if (first_iteration)
+            glBindTexture(GL_TEXTURE_2D, m_render_target->texture(index));
+        else
+            glBindTexture(GL_TEXTURE_2D,horizontal ? m_bloom->texture(1) : m_bloom->texture(0));
+
+        render_quad();
+        horizontal = !horizontal;
+        if (first_iteration)
+            first_iteration = false;
+    }
+
+    uint32_t final_bloom_texture = horizontal ? m_bloom->texture(1) : m_bloom->texture(0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target_secondary->framebuffer());
+    glViewport(0, 0, width, height);
+
+    auto* combine = resources->shader("bloom_final");
+
+    combine->use();
+    combine->set_int("scene", 0);
+    combine->set_int("bloomBlur", 1);
+    combine->set_float("exposure", 1.0f);
+    combine->set_bool("bloom", true);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_render_target->texture(0));
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, final_bloom_texture);
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    render_quad();
+
+    glEnable(GL_DEPTH_TEST);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target->framebuffer());
+    std::swap(m_render_target, m_render_target_secondary);
+    std::swap(m_final_texture, m_final_texture_secondary);
+}
 
 void GraphicsController::activate_point_shadow(resources::Shader *shader, int index) {
 
@@ -56,10 +184,7 @@ void GraphicsController::activate_point_shadow(resources::Shader *shader, int in
     glActiveTexture(GL_TEXTURE10 + index);
     glBindTexture(GL_TEXTURE_CUBE_MAP, shadow_map->cubemap());
 
-    shader->set_int(
-        "shadow_point_map[" + std::to_string(index) + "]",
-        10 + index
-    );
+    shader->set_int("shadow_point_map[" + std::to_string(index) + "]", 10 + index);
 }
 void GraphicsController::terminate() {
     if (ImGui::GetCurrentContext()) {
@@ -70,10 +195,15 @@ void GraphicsController::terminate() {
 }
 
 void GraphicsPlatformEventObserver::on_window_resize(int width, int height) {
+    auto graphics = engine::core::Controller::get<GraphicsController>();
     m_graphics->perspective_params().Width = static_cast<float>(width);
     m_graphics->perspective_params().Height = static_cast<float>(height);
     m_graphics->orthographic_params().Right = static_cast<float>(width);
     m_graphics->orthographic_params().Top = static_cast<float>(height);
+
+    graphics->m_render_target->resize(width, height);
+    graphics->m_render_target_secondary->resize(width, height);
+
     CHECKED_GL_CALL(glViewport, 0, 0, width, height);
 }
 
@@ -131,7 +261,7 @@ int GraphicsController::generate_point_shadow_map(unsigned int size) {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         throw util::Error("Point shadow framebuffer incomplete");
 
-    CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, 0);
+    CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, m_render_target->framebuffer());
     CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_CUBE_MAP, 0);
 
     m_point_shadow_maps.push_back(resources::PointShadowMap(depthMapFBO, depthCubemap, size));
@@ -156,7 +286,7 @@ void GraphicsController::apply_point_shadow(glm::vec3 position, resources::Point
     shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
     shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
     shadowTransforms.push_back(shadowProj * glm::lookAt(position, position + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-    glCullFace(GL_FRONT);
+
     glBindFramebuffer(GL_FRAMEBUFFER, map->fbo());
     glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -164,12 +294,13 @@ void GraphicsController::apply_point_shadow(glm::vec3 position, resources::Point
     auto platform = engine::core::Controller::get<platform::PlatformController>();
     auto *depth = resources->shader("point_shadow_depth");
 
+    depth->use();
     for (unsigned int i = 0; i < 6; ++i)
         depth->set_mat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
 
     depth->set_float("far_plane", far_plane);
     depth->set_vec3("lightPos", position);
-    depth->use();
+    glCullFace(GL_FRONT);
     for (int i = 0; i < model_names.size(); i++) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, translations[i]);
@@ -180,8 +311,9 @@ void GraphicsController::apply_point_shadow(glm::vec3 position, resources::Point
         auto *mesh = resources->model(model_names[i]);
         mesh->draw(depth);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target->framebuffer());
     glViewport(0, 0, platform->window()->width(), platform->window()->height());
     glCullFace(GL_BACK);
+
 }
 }// namespace engine::graphics
