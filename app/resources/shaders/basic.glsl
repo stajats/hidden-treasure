@@ -112,10 +112,9 @@ float calculatePointShadow(int i)
 
     vec3 fragToLight = FragPos - lights[i].position;
     float currentDepth = length(fragToLight);
-    float bias = 0.15;
+    float bias = 0.2;
     float shadow = 0.0;
     int samples = 20;
-    float viewDistance = length(viewPos - FragPos);
     float diskRadius = 0.05;
 
     for(int j = 0; j < samples; j++)
@@ -129,7 +128,7 @@ float calculatePointShadow(int i)
     return shadow;
 }
 
-vec3 calculateDiretionalLight() {
+vec3 calculateDirectionalLight() {
 
     //diffuese
     vec3 norm = normalize(Normal);
@@ -178,11 +177,7 @@ vec3 calculateSpotLight() {
 vec3 calculatePointLight(int i) {
 
     vec3 lightColor = lights[i].color;
-    float shadow;
-    if (enablePointShadow)
-        shadow = calculatePointShadow(i);
-    else
-        shadow = 0.0f;
+    float shadow = enablePointShadow ? calculatePointShadow(i): 0.0f;
     //diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lights[i].position - FragPos);
@@ -208,7 +203,7 @@ void main() {
     if (enableAmbient)
         result += materialAmbient * texture(texture_diffuse1, TexCoords).rgb;
     if (enableDirectional)
-        result += calculateDiretionalLight();
+        result += calculateDirectionalLight();
     if (enablePoint)
         for (int i = 0; i < num_of_light_sources; i++)
             result += calculatePointLight(i);
@@ -217,10 +212,6 @@ void main() {
 
     FragColor = vec4(result, 1.0);
 
-    float brightness = dot(result, vec3(0.2126, 1.0f, 0.0722));
-
-    if (brightness > 1.0)
-        BrightColor = vec4(result, 1.0);
-    else
-        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    BrightColor = brightness > 1.0 ? vec4(result, 1.0): vec4(0.0, 0.0, 0.0, 1.0);
 }
