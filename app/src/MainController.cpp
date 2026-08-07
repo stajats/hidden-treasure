@@ -24,12 +24,12 @@ void app::MainController::initialize() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     scene.load_scene();
-    for (auto &light: scene.lantern_lights) {
-        light.shadow_map_id = graphics->generate_point_shadow_map(1024);
-    }
-    for (auto &light: scene.flame_lights) {
-        light.shadow_map_id = graphics->generate_point_shadow_map(1024);
-    }
+    for (auto &light: scene.lantern_lights)
+        light.shadow_map_id = graphics->generate_point_shadow_map(512);
+
+    for (auto &light: scene.flame_lights)
+        light.shadow_map_id = graphics->generate_point_shadow_map(512);
+
     graphics->add_color_texture();
     graphics->add_color_texture();
 }
@@ -63,43 +63,42 @@ void app::MainController::draw_skybox() {
     graphics->draw_skybox(shader, skybox);
 
 }
-void app::MainController::draw_basic(Resource r, Transform t, Material m, DirectionalLight dl) {
+void app::MainController::set_modifiers(engine::resources::Shader *shader) {
+    // enable different effects
+    shader->set_bool("enableAmbient", scene.ambient_light);
+    shader->set_bool("enableDirectional", scene.directional_light);
+    shader->set_bool("enablePoint", scene.point_light);
+    shader->set_bool("enableSpot", scene.spot_light);
+    shader->set_bool("enablePointShadow", scene.point_shadows);
+    shader->set_float("enableAnimated", scene.animated_water);
+}
+void app::MainController::draw_basic(Resource &r, Transform &t, Material &m, DirectionalLight &dl) {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
 
     auto mesh = resources->model(r.model);
     auto shader = resources->shader(r.shader_name);
     auto skull_controller = engine::core::Controller::get<SkullController>();
 
-    float time = glfwGetTime();
+    float time = platform->time();
     shader->use();
-
-    int no_of_light_sources = this->scene.lantern_lights.size();
-    if (skull_controller->is_enabled())
-        no_of_light_sources += this->scene.flame_lights.size();
-    shader->set_int("num_of_light_sources", no_of_light_sources);
-
+    set_modifiers(shader);
     // lantern lights
+    int no_of_light_sources = this->scene.lantern_lights.size();
     for (int i = 0; i < this->scene.lantern_lights.size(); i++) {
         shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.lantern_lights[i].position);
-
         if (scene.pulsating_light)
             shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
         else
             shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color);
-
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
-        if (scene.point_shadows)
-            graphics->set_point_shadow_map(shader, i);
     }
-    if (scene.point_shadows)
-        for (size_t i = this->scene.lantern_lights.size(); i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
-            graphics->set_point_shadow_map(shader, i);
-        }
     if (skull_controller->is_enabled()) {
+        no_of_light_sources += this->scene.flame_lights.size();
         for (size_t i = this->scene.lantern_lights.size(); i < no_of_light_sources; i++) {
             shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.flame_lights[i - scene.lantern_lights.size()].position);
             shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.flame_lights[i - scene.lantern_lights.size()].color * std::sin((time - skull_controller->skull_time) / 2.0f));
@@ -108,14 +107,14 @@ void app::MainController::draw_basic(Resource r, Transform t, Material m, Direct
             shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.002f);
         }
     }
+    shader->set_int("num_of_light_sources", no_of_light_sources);
+
+    if (scene.point_shadows) {
+        for (size_t i = 0; i < scene.lantern_lights.size() + scene.flame_lights.size(); i++) {
+            graphics->set_point_shadow_map(shader, i);
+        }
+    }
     shader->set_float("currentTime", time);
-    // enable different effects
-    shader->set_bool("enableAmbient", scene.ambient_light);
-    shader->set_bool("enableDirectional", scene.directional_light);
-    shader->set_bool("enablePoint", scene.point_light);
-    shader->set_bool("enableSpot", scene.spot_light);
-    shader->set_bool("enablePointShadow", scene.point_shadows);
-    shader->set_float("enableAnimated", scene.animated_water);
     // spotlight
     shader->set_float("light.cutOff",   glm::cos(glm::radians(12.5f)));
     shader->set_float("light.outerCutOff", glm::cos(glm::radians(90.5f)));
@@ -150,24 +149,12 @@ void app::MainController::draw() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
-    std::vector<std::string> model_names = std::vector<std::string>(scene.objects.size());
-    std::vector<glm::vec3> translation = std::vector<glm::vec3>(scene.objects.size());
-    std::vector<float> angle = std::vector<float>(scene.objects.size());
-    std::vector<glm::vec3> axis = std::vector<glm::vec3>(scene.objects.size());
-    std::vector<glm::vec3> scale = std::vector<glm::vec3>(scene.objects.size());
-    for (int i = 0; i < scene.objects.size(); i++) {
-        model_names[i] = scene.objects[i].resource.model;
-        translation[i] = scene.objects[i].transform.translation;
-        angle[i] = scene.objects[i].transform.angle;
-        axis[i] = scene.objects[i].transform.axis;
-        scale[i] = scene.objects[i].transform.scale;
-    }
     if (scene.point_shadows) {
         for (auto &object: scene.lantern_lights) {
-            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
         }
         for (auto &object: scene.flame_lights) {
-            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), model_names, translation, angle, axis, scale);
+            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
         }
     }
 

@@ -66,6 +66,12 @@ public:
     bool enable_bloom;
     bool pulsating_light;
 
+    std::vector<std::string> model_names;
+    std::vector<glm::vec3> translation;
+    std::vector<float> angle;
+    std::vector<glm::vec3> axis;
+    std::vector<glm::vec3> scale;
+
     std::vector<Model> objects;
     std::vector<Model> lantern;
     std::vector<LightSource> lantern_lights;

@@ -127,7 +127,7 @@ float calculatePointShadow(int i)
     float currentDepth = length(fragToLight);
     float bias = 0.2;
     float shadow = 0.0;
-    int samples = 20;
+    int samples = 10;
     float viewDistance = length(viewPos - FragPos);
     float diskRadius = 0.05;
 

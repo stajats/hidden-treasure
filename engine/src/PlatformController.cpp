@@ -82,7 +82,9 @@ void PlatformController::terminate() {
         glfwTerminate();
     }
 }
-
+float PlatformController::time() {
+    return glfwGetTime();
+}
 bool PlatformController::loop() {
     m_frame_time.previous = m_frame_time.current;
     m_frame_time.current = glfwGetTime();

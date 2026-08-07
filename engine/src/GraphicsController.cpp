@@ -124,7 +124,7 @@ void GraphicsController::bloom(int index) {
     glViewport(0, 0, platform->window()->width(), platform->window()->height());
 
     bool horizontal = true, first_iteration = true;
-    unsigned int amount = 30;
+    unsigned int amount = 10;
 
     auto *blur = resources->shader("blur");
     blur->use();

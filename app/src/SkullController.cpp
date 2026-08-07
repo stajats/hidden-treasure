@@ -6,6 +6,7 @@
 
 #include "../../engine/libs/glfw/include/GLFW/glfw3.h"
 #include "MainController.hpp"
+#include "engine/platform/PlatformController.hpp"
 
 namespace app {
 
@@ -16,7 +17,8 @@ void SkullController::initialize() {
     this->set_enable(false);
 }
 void SkullController::update() {
-    float time = glfwGetTime();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    float time = platform->time();
     if (time - this->skull_time > 2.0f * M_PI)
         this->set_enable(false);
 }

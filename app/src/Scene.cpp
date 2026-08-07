@@ -137,5 +137,19 @@ void Scene::load_scene() {
     }
     flame_lights.push_back(LightSource(skull_color, glm::vec3(-1.941358f, 1.751783f, 20.432997f)));
     flame_lights.push_back(LightSource(skull_color, glm::vec3(-2.072591f, 1.710645f, 20.281853f)));
+
+    model_names = std::vector<std::string>(objects.size());
+    translation = std::vector<glm::vec3>(objects.size());
+    angle = std::vector<float>(objects.size());
+    axis = std::vector<glm::vec3>(objects.size());
+    scale = std::vector<glm::vec3>(objects.size());
+
+    for (int i = 0; i < objects.size(); i++) {
+        model_names[i] = objects[i].resource.model;
+        translation[i] = objects[i].transform.translation;
+        angle[i] = objects[i].transform.angle;
+        axis[i] = objects[i].transform.axis;
+        scale[i] = objects[i].transform.scale;
+    }
 }
 } // app

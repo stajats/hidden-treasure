@@ -24,8 +24,9 @@ public:
 
     Scene scene;
     std::string_view name() const override;
-    void draw_basic(Resource r, Transform t, Material m, DirectionalLight dl);
+    void draw_basic(Resource &r, Transform &t, Material &m, DirectionalLight &dl);
     void draw_skybox();
+    void set_modifiers(engine::resources::Shader *shader);
 };
 
 }// namespace app
