@@ -87,7 +87,7 @@ void RenderTarget::unbind() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderTarget::addColorTexture() {
+void RenderTarget::add_color_texture() {
     GLint currentFboId = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
 

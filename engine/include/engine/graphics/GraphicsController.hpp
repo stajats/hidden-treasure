@@ -90,11 +90,36 @@ public:
     * @brief Draws a @ref resources::Skybox with the @ref resources::Shader.
     */
     void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox) const;
+
+    /**
+      * @brief Generate point shadow map with a dimensions
+      * @Returns id for cubemap texture
+      */
     int generate_point_shadow_map(unsigned int size);
+
+    /**
+      * @Returns PointShadowMap object at a given index
+      */
     resources::PointShadowMap *point_shadow_map(int i);
+
+    /**
+      * @brief Generate point shadow map with a dimensions
+      * @Returns id for cubemap texture
+      */
+
+    /**
+      * @brief Sets uniform value for given PointShadowMap for a given shader
+      */
     void set_point_shadow_map(const resources::Shader *shader, int index);
 
+    /**
+      * @brief Renders a rectangle.
+      */
     void render_quad();
+
+    /**
+      * @brief Applies bloom with bright_texture location in RenderTarget given with index i.
+      */
     void bloom(int i);
 
     unsigned int quadVAO = 0;
@@ -103,6 +128,10 @@ public:
     /**
      * @brief Calculates and binds depth buffer for given lightsource and scene objects
      */
+
+    /**
+      * @brief Draws point shadow map to the corresponding cubemap.
+      */
     void draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale) const;
 
 

@@ -10,12 +10,21 @@ namespace engine {
 namespace graphics {
 
 Bloom::~Bloom() {
+    GLint currentFboId = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
+
     glDeleteFramebuffers(1, &(m_fbo[0]));
     glDeleteFramebuffers(1, &(m_fbo[1]));
 
     glDeleteTextures(static_cast<GLsizei>(2), m_texture);
+    if (currentFboId == m_fbo[0] || currentFboId == m_fbo[1]) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 Bloom::Bloom(int width, int height) {
+
+    GLint currentFboId = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
     for (int i = 0; i < 2; i++) {
         m_height = height;
         m_width = width;
@@ -33,6 +42,7 @@ Bloom::Bloom(int width, int height) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture[i], 0);
     }
+    glBindFramebuffer(GL_FRAMEBUFFER, currentFboId);
 }
 
 void Bloom::resize(uint32_t width, uint32_t height) {

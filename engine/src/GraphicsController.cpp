@@ -54,8 +54,8 @@ void GraphicsController::initialize() {
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
 }
 void GraphicsController::add_color_texture() const {
-    m_render_target->addColorTexture();
-    m_render_target_secondary->addColorTexture();
+    m_render_target->add_color_texture();
+    m_render_target_secondary->add_color_texture();
 }
 void GraphicsController::finalize_draw() {
 

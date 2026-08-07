@@ -11,56 +11,71 @@
 
 namespace engine {
 namespace graphics {
-
+/**
+ *  @class Bloom
+ *  @brief Creates render target for engine drawing process. Supports drawing to multiple textures for postprocessing
+ */
 class RenderTarget {
 
 public:
 
     RenderTarget() = default;
+    /**
+     * @brief Creates RenderTarget object with one output texture
+     */
     RenderTarget(int width, int height);
     ~RenderTarget();
 
     /**
-      * @brief
+      * @brief Adds a single output texture to current RenderTarget
       */
-    void addColorTexture();
+    void add_color_texture();
 
     /**
-      * @brief
-      */
-    void create(int width, int height);
-
-    /**
-      * @brief
+      * @brief Resize all resources to given dimensions
       */
     void resize(int width, int height);
 
     /**
-      * @brief
+      * @brief Binds RenderTarget framebuffer.
       */
     void bind();
 
     /**
-      * @brief
+      * @brief Unbinds RenderTarget framebuffer.
       */
     void unbind();
 
     /**
-      * @brief
+      * @brief Returns framebuffer for this object
       */
     GLuint framebuffer() const {
         return m_fbo;
     }
+
+    /**
+      * @brief Returns texture at a given index for this object
+      */
     GLuint texture(size_t index) const {
         return m_color_textures.at(index);
     }
+
+    /**
+      * @brief Returns all textures that belong to this object
+      */
     const std::vector<GLuint> & textures() const {
         return m_color_textures;
     }
+    /**
+      * @brief Returns current width
+      */
     int width() const {
         return m_width;
     }
 
+    /**
+      * @brief Returns current height
+      */
     int height() const {
         return m_height;
     }

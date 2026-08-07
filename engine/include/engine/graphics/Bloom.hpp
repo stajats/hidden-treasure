@@ -9,7 +9,7 @@
 namespace engine {
 namespace graphics {
 /**
- *  @class Camera
+ *  @class Bloom
  *  @brief Creates and stores framebuffers and textures needed to achieve bloom effect.
  */
 class Bloom {

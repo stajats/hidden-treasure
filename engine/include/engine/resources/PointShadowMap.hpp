@@ -15,6 +15,10 @@ class GraphicsController;
 namespace engine {
 namespace resources {
 
+/**
+ *  @class PointShadowMap
+ *  @brief Stores data needed for drawing point shadow maps
+ */
 class PointShadowMap {
 
     friend class engine::graphics::GraphicsController;
