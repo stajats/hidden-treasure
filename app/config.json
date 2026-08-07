@@ -16,11 +16,11 @@
       "rock": {
         "path": "rock/rock.obj"
       },
-      "big_rock": {
-        "path": "big_rock/big_rock.obj"
-      },
       "small_rock": {
         "path": "small_rock/small_rock.obj"
+      },
+      "big_rock": {
+        "path": "big_rock/big_rock.obj"
       },
       "ship": {
         "path": "ship/ship.obj"
