@@ -112,7 +112,7 @@ float calculatePointShadow(int i)
 
     vec3 fragToLight = FragPos - lights[i].position;
     float currentDepth = length(fragToLight);
-    float bias = 0.2;
+    float bias = max(0.05 * (1.0 - dot(Normal, fragToLight)), 0.005);
     float shadow = 0.0;
     int samples = 10;
     float diskRadius = 0.05;
