@@ -25,7 +25,6 @@ void MainController::initialize() {
 
     graphics->generate_n_point_shadow_maps(scene.lantern_lights.size() + scene.flame_lights.size());
     graphics->add_color_texture();
-    graphics->add_color_texture();
 }
 bool MainController::loop() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
@@ -44,7 +43,7 @@ void MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (scene.enable_bloom)
-        graphics->bloom(1, "blur");
+        graphics->bloom(0, "blur", "bloom_final");
     graphics->finalize_draw("final");
     platform->swap_buffers();
 }
@@ -148,9 +147,9 @@ void MainController::draw() {
 
     if (scene.point_shadows) {
         for (int i = 0; i < scene.lantern_lights.size(); i++)
-            graphics->draw_point_shadow_map(scene.lantern_lights[i].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
+            graphics->draw_point_shadow_map(scene.lantern_lights[i].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale, "point_shadow_depth");
         for (int i = scene.lantern_lights.size(); i < scene.flame_lights.size() + scene.lantern_lights.size(); i++) {
-            graphics->draw_point_shadow_map(scene.flame_lights[i - scene.lantern_lights.size()].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
+            graphics->draw_point_shadow_map(scene.flame_lights[i - scene.lantern_lights.size()].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale, "point_shadow_depth");
         }
     }
 

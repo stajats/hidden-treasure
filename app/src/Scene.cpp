@@ -17,6 +17,7 @@ void Scene::add_instances(const Resource& res, const Material& mat, const std::v
         );
     }
 }
+
 void Scene::load_scene() {
 
     this->objects.clear();
@@ -46,17 +47,6 @@ void Scene::load_scene() {
     Material mat_wood(0.10f, glm::vec3(0.25f, 0.22f, 0.2f), 10.0f);
     Material mat_metal(0.15f, glm::vec3(0.4f, 0.4f, 0.4f), 32.0f);
     Material mat_water(0.10f, glm::vec3(0.8f, 0.9f, 1.0f), 128.0f);
-
-
-    auto add_instances = [&](const Resource& res, const Material& mat, const std::vector<InstanceData>& instances, std::vector<Model> &arr) {
-        for (const auto& inst : instances) {
-            arr.emplace_back(
-                res,
-                Transform(inst.pos, inst.angle, glm::normalize(inst.axis), inst.scale),
-                mat
-            );
-        }
-    };
 
     this->objects.emplace_back(
         Resource("boat", "basic"),
@@ -129,6 +119,7 @@ void Scene::load_scene() {
         {glm::vec3(-1.941358f, 1.751783f, 20.432997f), 208.294342f, glm::vec3(-0.684907f, -0.419964f, 0.802914f), glm::vec3(0.025f) },
         {glm::vec3(-2.072591f, 1.710645f, 20.281853f), 143.233948f, glm::vec3(-1.378606f, -0.681398f, 0.062815f), glm::vec3(0.03f) },
     }, flame);
+
     for (int i = 0; i < lantern.size(); i++) {
         glm::vec3 offset(0.0f, 0.2f, 0.0f); // inside lantern
 

@@ -5,6 +5,7 @@
 #ifndef MATF_RG_PROJECT_RENDERTARGET_HPP
 #define MATF_RG_PROJECT_RENDERTARGET_HPP
 
+#include <GL/gl.h>
 #include <string>
 #include <vector>
 
@@ -20,10 +21,11 @@ public:
 
     RenderTarget() = default;
     /**
-     * @brief Creates RenderTarget object with one output texture
+     * @brief Creates RenderTarget object
      */
     RenderTarget(int width, int height);
-    ~RenderTarget();
+    ~RenderTarget() = default;
+    void destroy();
 
     /**
       * @brief Adds a single output texture to current RenderTarget
@@ -38,12 +40,13 @@ public:
     /**
       * @brief Binds RenderTarget framebuffer.
       */
-    void bind();
+    void bind() const;
 
     /**
       * @brief Unbinds RenderTarget framebuffer.
       */
     void unbind();
+    void swap_textures();
 
     /**
       * @brief Returns framebuffer for this object
@@ -81,11 +84,15 @@ public:
 private:
     unsigned m_fbo = 0;
     unsigned m_depth_stencil = 0;
+    unsigned m_texture_primary = 0;
+    unsigned m_texture_secondary = 0;
     std::vector<unsigned> m_color_textures;
     int m_width = 0;
     int m_height = 0;
 
     friend class GraphicsController;
+
+    void create_texture(unsigned &texture, int width, int height);
 };
 
 }// namespace graphics

@@ -120,7 +120,7 @@ public:
     /**
       * @brief Applies bloom with bright_texture location in RenderTarget given with index i.
       */
-    void bloom(int index, const char *blur_shader_name);
+    void bloom(int index, const char *blur_shader_name, const char *final_bloom_shader_name);
 
 
     /**
@@ -130,7 +130,7 @@ public:
     /**
       * @brief Draws point shadow map to the corresponding cubemap.
       */
-    void draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale) const;
+    void draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale, const char *point_shadow_depth) const;
 
 
     Camera *camera() {
@@ -202,7 +202,6 @@ public:
     void generate_n_point_shadow_maps(std::size_t size);
 
     std::unique_ptr<RenderTarget> m_render_target;
-    std::unique_ptr<RenderTarget> m_render_target_secondary;
     std::unique_ptr<Bloom> m_bloom;
 
     unsigned int m_quad_vao = 0;
@@ -214,8 +213,6 @@ public:
          1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
          1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     };
-    uint32_t m_final_texture{};
-    uint32_t m_final_texture_secondary{};
     void finalize_draw(const char *shader_name);
 
     void add_color_texture() const;

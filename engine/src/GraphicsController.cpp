@@ -37,26 +37,18 @@ void GraphicsController::initialize() {
     m_ortho_params.Near = 0.1f;
     m_ortho_params.Far = 100.0f;
 
-    float quadVertices[] = {
-        // positions        // texture Coords
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    };
     // setup plane VAO
     glGenVertexArrays(1, &m_quad_vao);
     glGenBuffers(1, &m_quad_vbo);
     glBindVertexArray(m_quad_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_quad_vertices), &m_quad_vertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void *>(nullptr));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
 
     m_render_target = std::make_unique<RenderTarget>(platform->window()->width(), platform->window()->height());
-    m_render_target_secondary = std::make_unique<RenderTarget>(platform->window()->width(), platform->window()->height());
     m_bloom = std::make_unique<Bloom>(platform->window()->width(), platform->window()->height());
 
     platform->register_platform_event_observer(std::make_unique<GraphicsPlatformEventObserver>(this));
@@ -76,7 +68,6 @@ void GraphicsController::generate_n_point_shadow_maps(std::size_t size) {
 }
 void GraphicsController::add_color_texture() const {
     m_render_target->add_color_texture();
-    m_render_target_secondary->add_color_texture();
 }
 void GraphicsController::finalize_draw(const char *shader_name) {
 
@@ -94,7 +85,7 @@ void GraphicsController::finalize_draw(const char *shader_name) {
     shader->set_int("scene", 0);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_render_target->texture(0));
+    glBindTexture(GL_TEXTURE_2D, m_render_target->m_texture_primary);
 
     glDisable(GL_DEPTH_TEST);
     render_quad();
@@ -108,12 +99,9 @@ void GraphicsController::render_quad() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
-void GraphicsController::bloom(int index, const char *blur_shader_name) {
+void GraphicsController::bloom(int index, const char *blur_shader_name, const char *final_bloom_shader_name) {
     auto platform = core::Controller::get<platform::PlatformController>();
     auto resources = engine::core::Controller::get<resources::ResourcesController>();
-
-    int width = platform->window()->width();
-    int height = platform->window()->height();
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_bloom->fbo(0));
     glViewport(0, 0, platform->window()->width(), platform->window()->height());
@@ -144,10 +132,10 @@ void GraphicsController::bloom(int index, const char *blur_shader_name) {
 
     uint32_t final_bloom_texture = horizontal ? m_bloom->texture(1) : m_bloom->texture(0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target_secondary->framebuffer());
-    glViewport(0, 0, width, height);
+    m_render_target->swap_textures();
+    m_render_target->bind();
 
-    auto* combine = resources->shader("bloom_final");
+    auto* combine = resources->shader(final_bloom_shader_name);
 
     combine->use();
     combine->set_int("scene", 0);
@@ -156,7 +144,7 @@ void GraphicsController::bloom(int index, const char *blur_shader_name) {
     combine->set_bool("bloom", true);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_render_target->texture(0));
+    glBindTexture(GL_TEXTURE_2D, m_render_target->m_texture_secondary);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, final_bloom_texture);
@@ -169,8 +157,6 @@ void GraphicsController::bloom(int index, const char *blur_shader_name) {
     glEnable(GL_DEPTH_TEST);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_render_target->framebuffer());
-    std::swap(m_render_target, m_render_target_secondary);
-    std::swap(m_final_texture, m_final_texture_secondary);
 }
 
 void GraphicsController::set_point_shadow_map(const resources::Shader *shader, int index) {
@@ -197,8 +183,6 @@ void GraphicsPlatformEventObserver::on_window_resize(int width, int height) {
     m_graphics->orthographic_params().Top = static_cast<float>(height);
 
     graphics->m_render_target->resize(width, height);
-    graphics->m_render_target_secondary->resize(width, height);
-
     graphics->m_bloom->resize(width, height);
 
     CHECKED_GL_CALL(glViewport, 0, 0, width, height);
@@ -268,7 +252,7 @@ resources::PointShadowMap *GraphicsController::point_shadow_map(int i) {
     RG_GUARANTEE(i >= 0 && i < m_point_shadow_maps.size(), "Index out of bounds");
     return &m_point_shadow_maps[i];
 }
-void GraphicsController::draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale) const {
+void GraphicsController::draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale, const char *point_shadow_depth) const {
     const unsigned int SHADOW_WIDTH = map->size(), SHADOW_HEIGHT = map->size();
 
     float near_plane = 0.3f;
@@ -287,7 +271,7 @@ void GraphicsController::draw_point_shadow_map(glm::vec3 position, const resourc
     glClear(GL_DEPTH_BUFFER_BIT);
     auto resources = engine::core::Controller::get<resources::ResourcesController>();
     auto platform = engine::core::Controller::get<platform::PlatformController>();
-    auto *depth = resources->shader("point_shadow_depth");
+    auto *depth = resources->shader(point_shadow_depth);
 
     depth->use();
     for (unsigned int i = 0; i < 6; ++i)
