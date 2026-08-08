@@ -11,8 +11,8 @@ namespace graphics {
 
 RenderTarget::RenderTarget(int width, int height) {
 
-    GLint currentFboId = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
+    GLint current_fbo_id = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo_id);
 
     m_width = width;
     m_height = height;
@@ -32,10 +32,9 @@ RenderTarget::RenderTarget(int width, int height) {
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + 0, GL_TEXTURE_2D, m_color_textures[0], 0);
 
-    std::vector<GLenum> attachments;
-    attachments.push_back(GL_COLOR_ATTACHMENT0 + 0);
-
+    std::array<GLenum, 1> attachments = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(static_cast<GLsizei>(attachments.size()), attachments.data());
+
     glGenRenderbuffers(1, &m_depth_stencil);
 
     glBindRenderbuffer(GL_RENDERBUFFER, m_depth_stencil);
@@ -46,14 +45,14 @@ RenderTarget::RenderTarget(int width, int height) {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         throw util::Error("RenderTarget incomplete");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, currentFboId);
+    glBindFramebuffer(GL_FRAMEBUFFER, current_fbo_id);
 }
 
 RenderTarget::~RenderTarget() {
 
-    GLint currentFboId = 0;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFboId);
-    if (currentFboId == this->m_fbo)
+    GLint current_fbo_id = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo_id);
+    if (current_fbo_id == this->m_fbo)
         unbind();
 
     glDeleteFramebuffers(1, &m_fbo);
@@ -108,10 +107,10 @@ void RenderTarget::add_color_texture() {
     m_color_textures.push_back(texture);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + m_color_textures.size() - 1, GL_TEXTURE_2D, texture, 0);
 
-    std::vector<GLenum> buffers;
+    std::vector<GLenum> buffers(m_color_textures.size());
 
-    for(size_t i = 0; i < m_color_textures.size(); i++)
-        buffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+    for (size_t i = 0; i < buffers.size(); i++)
+        buffers[i] = GL_COLOR_ATTACHMENT0 + i;
 
     glDrawBuffers(buffers.size(), buffers.data());
     glBindFramebuffer(GL_FRAMEBUFFER, currentFboId);

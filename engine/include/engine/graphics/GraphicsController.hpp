@@ -120,7 +120,7 @@ public:
     /**
       * @brief Applies bloom with bright_texture location in RenderTarget given with index i.
       */
-    void bloom(int i);
+    void bloom(int index, const char *blur_shader_name);
 
 
     /**
@@ -199,10 +199,11 @@ public:
     const OrthographicMatrixParams &orthographic_params() const {
         return m_ortho_params;
     }
+    void generate_n_point_shadow_maps(std::size_t size);
 
-    RenderTarget *m_render_target{};
-    RenderTarget *m_render_target_secondary{};
-    Bloom *m_bloom{};
+    std::unique_ptr<RenderTarget> m_render_target;
+    std::unique_ptr<RenderTarget> m_render_target_secondary;
+    std::unique_ptr<Bloom> m_bloom;
 
     unsigned int m_quad_vao = 0;
     unsigned int m_quad_vbo;
@@ -215,7 +216,7 @@ public:
     };
     uint32_t m_final_texture{};
     uint32_t m_final_texture_secondary{};
-    void finalize_draw();
+    void finalize_draw(const char *shader_name);
 
     void add_color_texture() const;
 private:

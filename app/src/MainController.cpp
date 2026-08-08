@@ -22,12 +22,8 @@ void MainController::initialize() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     scene.load_scene();
-    for (auto &light: scene.lantern_lights)
-        light.shadow_map_id = graphics->generate_point_shadow_map(512);
 
-    for (auto &light: scene.flame_lights)
-        light.shadow_map_id = graphics->generate_point_shadow_map(512);
-
+    graphics->generate_n_point_shadow_maps(scene.lantern_lights.size() + scene.flame_lights.size());
     graphics->add_color_texture();
     graphics->add_color_texture();
 }
@@ -48,8 +44,8 @@ void MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (scene.enable_bloom)
-        graphics->bloom(1);
-    graphics->finalize_draw();
+        graphics->bloom(1, "blur");
+    graphics->finalize_draw("final");
     platform->swap_buffers();
 }
 void MainController::draw_skybox() {
@@ -151,11 +147,10 @@ void MainController::draw() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
     if (scene.point_shadows) {
-        for (auto &object: scene.lantern_lights) {
-            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
-        }
-        for (auto &object: scene.flame_lights) {
-            graphics->draw_point_shadow_map(object.position, graphics->point_shadow_map(object.shadow_map_id), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
+        for (int i = 0; i < scene.lantern_lights.size(); i++)
+            graphics->draw_point_shadow_map(scene.lantern_lights[i].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
+        for (int i = scene.lantern_lights.size(); i < scene.flame_lights.size() + scene.lantern_lights.size(); i++) {
+            graphics->draw_point_shadow_map(scene.flame_lights[i - scene.lantern_lights.size()].position, graphics->point_shadow_map(i), scene.model_names, scene.translation, scene.angle, scene.axis, scene.scale);
         }
     }
 

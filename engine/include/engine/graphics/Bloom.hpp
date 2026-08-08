@@ -42,6 +42,7 @@ public:
     }
 
     ~Bloom();
+    void destroy();
     Bloom(int width, int height);
 
     /**

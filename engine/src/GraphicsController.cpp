@@ -55,9 +55,9 @@ void GraphicsController::initialize() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
 
-    m_render_target = new RenderTarget(platform->window()->width(), platform->window()->height());
-    m_render_target_secondary = new RenderTarget(platform->window()->width(), platform->window()->height());
-    m_bloom = new Bloom(platform->window()->width(), platform->window()->height());
+    m_render_target = std::make_unique<RenderTarget>(platform->window()->width(), platform->window()->height());
+    m_render_target_secondary = std::make_unique<RenderTarget>(platform->window()->width(), platform->window()->height());
+    m_bloom = std::make_unique<Bloom>(platform->window()->width(), platform->window()->height());
 
     platform->register_platform_event_observer(std::make_unique<GraphicsPlatformEventObserver>(this));
     CHECKED_GL_CALL(glViewport, 0, 0, platform->window()->width(), platform->window()->height());
@@ -69,11 +69,16 @@ void GraphicsController::initialize() {
     RG_GUARANTEE(ImGui_ImplGlfw_InitForOpenGL(handle, true), "ImGUI failed to initialize for OpenGL");
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
 }
+void GraphicsController::generate_n_point_shadow_maps(std::size_t size) {
+    for (size_t i = 0; i < size; i++)
+        generate_point_shadow_map(512);
+
+}
 void GraphicsController::add_color_texture() const {
     m_render_target->add_color_texture();
     m_render_target_secondary->add_color_texture();
 }
-void GraphicsController::finalize_draw() {
+void GraphicsController::finalize_draw(const char *shader_name) {
 
     auto platform =core::Controller::get<platform::PlatformController>();
     auto resources =core::Controller::get<resources::ResourcesController>();
@@ -84,7 +89,7 @@ void GraphicsController::finalize_draw() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
 
-    auto* shader = resources->shader("final");
+    auto* shader = resources->shader(shader_name);
     shader->use();
     shader->set_int("scene", 0);
 
@@ -103,7 +108,7 @@ void GraphicsController::render_quad() {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
-void GraphicsController::bloom(int index) {
+void GraphicsController::bloom(int index, const char *blur_shader_name) {
     auto platform = core::Controller::get<platform::PlatformController>();
     auto resources = engine::core::Controller::get<resources::ResourcesController>();
 
@@ -116,7 +121,7 @@ void GraphicsController::bloom(int index) {
     bool horizontal = true, first_iteration = true;
     unsigned int amount = 10;
 
-    auto *blur = resources->shader("blur");
+    auto *blur = resources->shader(blur_shader_name);
     blur->use();
     blur->set_int("image", 0);
 
@@ -260,9 +265,7 @@ int GraphicsController::generate_point_shadow_map(unsigned int size) {
     return static_cast<int>(m_point_shadow_maps.size()) - 1;
 }
 resources::PointShadowMap *GraphicsController::point_shadow_map(int i) {
-    if (i < 0 || i >= m_point_shadow_maps.size()) {
-        throw util::Error("m_point_shadow_maps index out of bounds");
-    }
+    RG_GUARANTEE(i >= 0 && i < m_point_shadow_maps.size(), "Index out of bounds");
     return &m_point_shadow_maps[i];
 }
 void GraphicsController::draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale) const {
