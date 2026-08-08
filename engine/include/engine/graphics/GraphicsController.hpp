@@ -6,6 +6,11 @@
 #ifndef GRAPHICSCONTROLLER_HPP
 #define GRAPHICSCONTROLLER_HPP
 
+#include "Bloom.hpp"
+#include "RenderTarget.hpp"
+#include "engine/resources/PointShadowMap.hpp"
+
+
 #include <engine/core/Controller.hpp>
 #include <engine/graphics/Camera.hpp>
 #include <engine/platform/PlatformEventObserver.hpp>
@@ -84,7 +89,49 @@ public:
     /**
     * @brief Draws a @ref resources::Skybox with the @ref resources::Shader.
     */
-    void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox);
+    void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox) const;
+
+    /**
+      * @brief Generate point shadow map with a dimensions
+      * @Returns id for cubemap texture
+      */
+    int generate_point_shadow_map(unsigned int size);
+
+    /**
+      * @Returns PointShadowMap object at a given index
+      */
+    resources::PointShadowMap *point_shadow_map(int i);
+
+    /**
+      * @brief Generate point shadow map with a dimensions
+      * @Returns id for cubemap texture
+      */
+
+    /**
+      * @brief Sets uniform value for given PointShadowMap for a given shader
+      */
+    void set_point_shadow_map(const resources::Shader *shader, int index);
+
+    /**
+      * @brief Renders a rectangle.
+      */
+    void render_quad();
+
+    /**
+      * @brief Applies bloom with bright_texture location in RenderTarget given with index i.
+      */
+    void bloom(int index, const char *blur_shader_name, const char *final_bloom_shader_name);
+
+
+    /**
+     * @brief Calculates and binds depth buffer for given lightsource and scene objects
+     */
+
+    /**
+      * @brief Draws point shadow map to the corresponding cubemap.
+      */
+    void draw_point_shadow_map(glm::vec3 position, const resources::PointShadowMap *map, const std::vector<std::string> &model_names, const std::vector<glm::vec3> &translations, const std::vector<float> &angle, const std::vector<glm::vec3> &axis, const std::vector<glm::vec3> &scale, const char *point_shadow_depth) const;
+
 
     Camera *camera() {
         return &m_camera;
@@ -152,7 +199,23 @@ public:
     const OrthographicMatrixParams &orthographic_params() const {
         return m_ortho_params;
     }
+    void generate_n_point_shadow_maps(std::size_t size);
 
+    std::unique_ptr<RenderTarget> m_render_target;
+    std::unique_ptr<Bloom> m_bloom;
+
+    unsigned int m_quad_vao = 0;
+    unsigned int m_quad_vbo;
+    std::array<float, 20> m_quad_vertices = {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+    void finalize_draw(const char *shader_name);
+
+    void add_color_texture() const;
 private:
     /**
     * @brief Initializes OpenGL, ImGUI, and projection matrix params;
@@ -163,6 +226,11 @@ private:
 
     PerspectiveMatrixParams m_perspective_params{};
     OrthographicMatrixParams m_ortho_params{};
+
+    /**
+     * @breif A hashmap of all the loaded @ref PointShadowMap
+     */
+    std::vector<resources::PointShadowMap> m_point_shadow_maps;
 
     glm::mat4 m_projection_matrix{};
     Camera m_camera{};

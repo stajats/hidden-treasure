@@ -1,0 +1,78 @@
+//
+// Created by kaloyan on 7/21/26.
+//
+
+#include "GUIController.hpp"
+#include "MainController.hpp"
+#include "engine/graphics/GraphicsController.hpp"
+#include "engine/platform/PlatformController.hpp"
+#include "imgui.h"
+
+namespace app {
+
+void GUIController::initialize() {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    set_enable(false);
+    platform->enable_cursor(false);
+}
+void GUIController::draw() {
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto main = engine::core::Controller::get<MainController>();
+
+    auto camera = graphics->camera();
+
+    graphics->begin_gui();
+
+    ImGui::SeparatorText("Camera info");
+    ImGui::Text("Camera position: (%f, %f, %f)", camera->Position.x, camera->Position.y, camera->Position.z);
+    ImGui::Text("Camera direction: (%f, %f, %f)", camera->Front.x, camera->Front.y, camera->Front.z);
+
+    ImGui::SeparatorText("Lighting component switches:");
+    ImGui::Checkbox("Enable ambient light", &(main->scene.ambient_light));
+    ImGui::Checkbox("Enable directional light", &(main->scene.directional_light));
+    ImGui::Checkbox("Enable point light", &(main->scene.point_light));
+    ImGui::Checkbox("Enable spot light", &(main->scene.spot_light));
+
+    ImGui::SeparatorText("Lighting color");
+    ImGui::InputFloat3("Sun light", &(main->scene.sun_light.color).x, "%.3f");
+    main->scene.sun_light.color = clamp(main->scene.sun_light.color, 0.0f, 1.0f);
+    ImGui::InputFloat3("Lanthern light", &(main->scene.lanthern_color).x, "%.3f");
+    main->scene.lanthern_color = clamp(main->scene.lanthern_color, 0.0f, 1.0f);
+    for (int i = 0; i < main->scene.lantern_lights.size(); i++) {
+        main->scene.lantern_lights[i].color = main->scene.lanthern_color;
+    }
+    ImGui::InputFloat3("Skull light", &(main->scene.skull_color).x, "%.3f");
+    main->scene.skull_color = clamp(main->scene.skull_color, 0.0f, 1.0f);
+    for (int i = 0; i < main->scene.flame_lights.size(); i++) {
+        main->scene.flame_lights[i].color = main->scene.skull_color;
+    }
+    ImGui::InputFloat3("Spot light", &(main->scene.spot_light_color).x, "%.3f");
+    main->scene.spot_light_color = clamp(main->scene.spot_light_color, 0.0f, 1.0f);
+    ImGui::SeparatorText("Visual effects");
+    ImGui::Checkbox("Enable pulsating lantherns", &(main->scene.pulsating_light));
+    ImGui::Checkbox("Enable animated water", &(main->scene.animated_water));
+    ImGui::Checkbox("Enable point shadows", &(main->scene.point_shadows));
+    ImGui::Checkbox("Enable bloom", &(main->scene.enable_bloom));
+
+    ImGui::SeparatorText("Performance");
+    ImGui::Text("FPS: %.1f (%.3f ms/frame)",
+    ImGui::GetIO().Framerate,
+    1000.0f / ImGui::GetIO().Framerate);
+
+    graphics->end_gui();
+}
+
+void GUIController::poll_events() {
+
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+
+    if (platform->key(engine::platform::KEY_Q).state() == engine::platform::Key::State::JustPressed) {
+        set_enable(!is_enabled());
+        auto window = platform->window();
+        platform->enable_cursor(is_enabled());
+    }
+}
+std::string_view app::GUIController::name() const {
+    return "app::GUIController";
+}
+}// namespace app

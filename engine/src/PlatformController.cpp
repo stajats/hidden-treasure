@@ -1,10 +1,10 @@
 // clang-format off
 #include <GLFW/glfw3.h>
 // clang-format on
-#include <imgui_impl_glfw.h>
 
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
+
 #include <engine/util/Utils.hpp>
 
 #include <engine/util/Configuration.hpp>
@@ -80,7 +80,12 @@ void PlatformController::terminate() {
         glfwTerminate();
     }
 }
-
+void PlatformController::enable_cursor(bool enabled) {
+    if (enabled)
+        glfwSetInputMode(window()->handle_(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    else
+        glfwSetInputMode(window()->handle_(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 bool PlatformController::loop() {
     m_frame_time.previous = m_frame_time.current;
     m_frame_time.current = glfwGetTime();

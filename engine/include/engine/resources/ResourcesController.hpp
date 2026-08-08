@@ -46,7 +46,6 @@ public:
                      const std::filesystem::path &path = "",
                      TextureType texture_type = TextureType::Regular,
                      bool flip_uvs = false);
-
     /**
     * @brief Retrieves the @ref Skybox with a given name. You are not supposed to call `delete` on this pointer.
     *
@@ -89,7 +88,6 @@ private:
     * @brief Loads all the models from the "resources/textures" directory. Called during @ref ResourcesController::initialize.
     */
     void load_textures();
-
     /**
     * @brief Loads all the skyboxes from the "resources/skyboxes" directory. Called during @ref ResourcesController::initialize.
     */

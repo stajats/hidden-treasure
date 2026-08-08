@@ -3,11 +3,13 @@
 #include <assimp/scene.h>
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/resources/ResourcesController.hpp>
+
+#include "engine/resources/PointShadowMap.hpp"
+
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Configuration.hpp>
 #include <engine/util/Errors.hpp>
 #include <spdlog/spdlog.h>
-#include <unordered_set>
 #include <utility>
 
 namespace engine::resources {
@@ -153,7 +155,6 @@ Texture *ResourcesController::texture(const std::string &name, const std::filesy
     }
     return result.get();
 }
-
 Skybox *ResourcesController::skybox(const std::string &name, const std::filesystem::path &path, bool flip_uvs) {
     auto &result = m_sky_boxes[name];
     if (!result) {

@@ -1,11 +1,41 @@
 {
   "resources": {
     "models": {
+      "boat": {
+        "path": "boat/boat.obj"
+      },
+      "island": {
+        "path": "island/island.obj"
+      },
+      "water": {
+        "path": "water/water.obj"
+      },
+      "chest": {
+        "path": "chest/chest.obj"
+      },
+      "rock": {
+        "path": "rock/rock.obj"
+      },
+      "small_rock": {
+        "path": "small_rock/small_rock.obj"
+      },
+      "big_rock": {
+        "path": "big_rock/big_rock.obj"
+      },
+      "ship": {
+        "path": "ship/ship.obj"
+      },
+      "lantern": {
+        "path": "lantern/lantern.obj"
+      },
+      "flame": {
+        "path": "flame/flame.obj"
+      }
     }
   },
   "window": {
     "height": 600,
-    "title": "Hello, window!",
+    "title": "Hidden treasure",
     "width": 800
   }
 }

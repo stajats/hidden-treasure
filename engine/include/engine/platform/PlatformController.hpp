@@ -130,6 +130,7 @@ public:
 
     void _platform_on_mouse_button(int button, int action);
 
+    void enable_cursor(bool enabled);
 private:
     Key &key_ref(KeyId key);
 
