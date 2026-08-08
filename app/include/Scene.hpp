@@ -11,6 +11,13 @@
 
 namespace app {
 
+struct InstanceData {
+    glm::vec3 pos;
+    float angle;
+    glm::vec3 axis;
+    glm::vec3 scale;
+};
+
 struct Transform
 {
     glm::vec3 translation;
@@ -49,7 +56,7 @@ struct Model {
 };
 class Scene {
 public:
-
+    void add_instances(const Resource &res, const Material &mat, const std::vector<InstanceData> &instances, std::vector<Model> &arr);
     void load_scene();
 
     DirectionalLight sun_light;

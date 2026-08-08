@@ -24,7 +24,7 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
 
     if (engine::platform::KeyId::KEY_E == key.id()) {
         skull_controller->set_enable(true);
-        skull_controller->skull_time = platform->time();
+        skull_controller->skull_time = platform->frame_time().current;
     }
 }
 } // app

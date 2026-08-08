@@ -80,9 +80,6 @@ void PlatformController::terminate() {
         glfwTerminate();
     }
 }
-float PlatformController::time() {
-    return glfwGetTime();
-}
 void PlatformController::enable_cursor(bool enabled) {
     if (enabled)
         glfwSetInputMode(window()->handle_(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);

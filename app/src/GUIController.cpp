@@ -10,7 +10,6 @@
 
 namespace app {
 
-float a[3];
 void GUIController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     set_enable(false);

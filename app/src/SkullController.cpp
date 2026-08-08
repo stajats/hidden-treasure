@@ -16,7 +16,7 @@ void SkullController::initialize() {
 }
 void SkullController::update() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    float time = platform->time();
+    float time = platform->frame_time().current;
     if (time - this->skull_time > 2.0f * M_PI)
         this->set_enable(false);
 }

@@ -37,9 +37,27 @@ void GraphicsController::initialize() {
     m_ortho_params.Near = 0.1f;
     m_ortho_params.Far = 100.0f;
 
+    float quadVertices[] = {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+    // setup plane VAO
+    glGenVertexArrays(1, &m_quad_vao);
+    glGenBuffers(1, &m_quad_vbo);
+    glBindVertexArray(m_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void *>(nullptr));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
+
     m_render_target = new RenderTarget(platform->window()->width(), platform->window()->height());
     m_render_target_secondary = new RenderTarget(platform->window()->width(), platform->window()->height());
-    m_bloom = nullptr;
+    m_bloom = new Bloom(platform->window()->width(), platform->window()->height());
 
     platform->register_platform_event_observer(std::make_unique<GraphicsPlatformEventObserver>(this));
     CHECKED_GL_CALL(glViewport, 0, 0, platform->window()->width(), platform->window()->height());
@@ -80,29 +98,8 @@ void GraphicsController::finalize_draw() {
     m_render_target->bind();
 }
 
-void GraphicsController::render_quad()
-{
-    if (quad_vao == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quad_vao);
-        glGenBuffers(1, &quad_vbo);
-        glBindVertexArray(quad_vao);
-        glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void *>(nullptr));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
-    }
-    glBindVertexArray(quad_vao);
+void GraphicsController::render_quad() {
+    glBindVertexArray(m_quad_vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
@@ -112,11 +109,6 @@ void GraphicsController::bloom(int index) {
 
     int width = platform->window()->width();
     int height = platform->window()->height();
-
-    if (m_bloom == nullptr)
-        m_bloom = new Bloom(width, height);
-    else
-        m_bloom->resize(width, height);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_bloom->fbo(0));
     glViewport(0, 0, platform->window()->width(), platform->window()->height());
@@ -201,6 +193,8 @@ void GraphicsPlatformEventObserver::on_window_resize(int width, int height) {
 
     graphics->m_render_target->resize(width, height);
     graphics->m_render_target_secondary->resize(width, height);
+
+    graphics->m_bloom->resize(width, height);
 
     CHECKED_GL_CALL(glViewport, 0, 0, width, height);
 }

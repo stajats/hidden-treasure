@@ -15,7 +15,8 @@
 #include <engine/resources/Skybox.hpp>
 #include <imgui_impl_opengl3.h>
 
-void app::MainController::initialize() {
+namespace app {
+void MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
@@ -30,7 +31,7 @@ void app::MainController::initialize() {
     graphics->add_color_texture();
     graphics->add_color_texture();
 }
-bool app::MainController::loop() {
+bool MainController::loop() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     if (platform->key(engine::platform::KeyId::KEY_ESCAPE).is_down()) {
         return false;
@@ -40,10 +41,10 @@ bool app::MainController::loop() {
 std::string_view app::MainController::name() const {
     return "app::MainController";
 }
-void app::MainController::begin_draw() {
+void MainController::begin_draw() {
     engine::graphics::OpenGL::clear_buffers();
 }
-void app::MainController::end_draw() {
+void MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     if (scene.enable_bloom)
@@ -51,7 +52,7 @@ void app::MainController::end_draw() {
     graphics->finalize_draw();
     platform->swap_buffers();
 }
-void app::MainController::draw_skybox() {
+void MainController::draw_skybox() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
@@ -60,7 +61,7 @@ void app::MainController::draw_skybox() {
     graphics->draw_skybox(shader, skybox);
 
 }
-void app::MainController::set_modifiers(engine::resources::Shader *shader) {
+void MainController::set_modifiers(engine::resources::Shader *shader) {
     // enable different effects
     shader->set_bool("enableAmbient", scene.ambient_light);
     shader->set_bool("enableDirectional", scene.directional_light);
@@ -69,7 +70,7 @@ void app::MainController::set_modifiers(engine::resources::Shader *shader) {
     shader->set_bool("enablePointShadow", scene.point_shadows);
     shader->set_float("enableAnimated", scene.animated_water);
 }
-void app::MainController::draw_basic(Resource &r, Transform &t, Material &m, DirectionalLight &dl) {
+void MainController::draw_basic(const Resource &r, const Transform &t, const Material &m, const DirectionalLight &dl) {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
@@ -79,17 +80,20 @@ void app::MainController::draw_basic(Resource &r, Transform &t, Material &m, Dir
     auto shader = resources->shader(r.shader_name);
     auto skull_controller = engine::core::Controller::get<SkullController>();
 
-    float time = platform->time();
+    float time = platform->frame_time().current;
     shader->use();
     set_modifiers(shader);
     // lantern lights
     int no_of_light_sources = this->scene.lantern_lights.size();
     for (int i = 0; i < this->scene.lantern_lights.size(); i++) {
         shader->set_vec3("lights[" + std::to_string(i) + "].position", scene.lantern_lights[i].position);
-        if (scene.pulsating_light)
-            shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f);
+        if (scene.pulsating_light) {
+            glm::vec3 light_color = scene.lantern_lights[i].color + glm::vec3(sin(time + i), sin(2 * time + i), sin(3 * time + i)) / 10.0f;
+            shader->set_vec3("lights[" + std::to_string(i) + "].color", light_color);
+        }
         else
             shader->set_vec3("lights[" + std::to_string(i) + "].color", scene.lantern_lights[i].color);
+
         shader->set_float("lights[" + std::to_string(i) + "].constant",  1.0f);
         shader->set_float("lights[" + std::to_string(i) + "].linear",    0.09f);
         shader->set_float("lights[" + std::to_string(i) + "].quadratic", 0.032f);
@@ -142,7 +146,7 @@ void app::MainController::draw_basic(Resource &r, Transform &t, Material &m, Dir
     mesh->draw(shader);
 }
 
-void app::MainController::draw() {
+void MainController::draw() {
 
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
 
@@ -163,7 +167,7 @@ void app::MainController::draw() {
     }
     draw_skybox();
 }
-void app::MainController::update_camera() {
+void MainController::update_camera() {
     auto gui_controller = engine::core::Controller::get<app::GUIController>();
     if (gui_controller->is_enabled()) return;
 
@@ -184,6 +188,7 @@ void app::MainController::update_camera() {
     auto observer = std::make_unique<MainPlatformEventObserver>();
 }
 
-void app::MainController::update() {
+void MainController::update() {
     update_camera();
 }
+} //app

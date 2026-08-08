@@ -122,8 +122,6 @@ public:
       */
     void bloom(int i);
 
-    unsigned int quad_vao = 0;
-    unsigned int quad_vbo;
 
     /**
      * @brief Calculates and binds depth buffer for given lightsource and scene objects
@@ -206,6 +204,15 @@ public:
     RenderTarget *m_render_target_secondary{};
     Bloom *m_bloom{};
 
+    unsigned int m_quad_vao = 0;
+    unsigned int m_quad_vbo;
+    std::array<float, 20> m_quad_vertices = {
+        // positions        // texture Coords
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
     uint32_t m_final_texture{};
     uint32_t m_final_texture_secondary{};
     void finalize_draw();
