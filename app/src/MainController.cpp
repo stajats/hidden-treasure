@@ -22,8 +22,6 @@ void MainController::initialize() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     platform->register_platform_event_observer(std::make_unique<MainPlatformEventObserver>());
     scene.load_scene();
-
-    graphics->generate_n_point_shadow_maps(scene.lantern_lights.size() + scene.flame_lights.size());
     graphics->add_color_texture();
 }
 bool MainController::loop() {

@@ -60,6 +60,7 @@ void GraphicsController::initialize() {
     (void) io;
     RG_GUARANTEE(ImGui_ImplGlfw_InitForOpenGL(handle, true), "ImGUI failed to initialize for OpenGL");
     RG_GUARANTEE(ImGui_ImplOpenGL3_Init("#version 330 core"), "ImGUI failed to initialize for OpenGL");
+    generate_n_point_shadow_maps(16);
 }
 void GraphicsController::generate_n_point_shadow_maps(std::size_t size) {
     for (size_t i = 0; i < size; i++)

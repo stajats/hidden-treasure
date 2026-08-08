@@ -5,13 +5,11 @@
 #include <engine/resources/ResourcesController.hpp>
 
 #include "engine/resources/PointShadowMap.hpp"
-#include "glad/glad.h"
 
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Configuration.hpp>
 #include <engine/util/Errors.hpp>
 #include <spdlog/spdlog.h>
-#include <unordered_set>
 #include <utility>
 
 namespace engine::resources {
