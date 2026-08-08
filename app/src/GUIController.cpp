@@ -2,11 +2,10 @@
 // Created by kaloyan on 7/21/26.
 //
 
-#include "engine/graphics/GraphicsController.hpp"
-#include "../include/GUIController.hpp"
-#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
+#include "GUIController.hpp"
 #include "MainController.hpp"
-#include "engine/platform//PlatformController.hpp"
+#include "engine/graphics/GraphicsController.hpp"
+#include "engine/platform/PlatformController.hpp"
 #include "imgui.h"
 
 namespace app {
@@ -15,8 +14,7 @@ float a[3];
 void GUIController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     set_enable(false);
-    auto window = platform->window();
-    glfwSetInputMode(window->handle_(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    platform->enable_cursor(false);
 }
 void GUIController::draw() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
@@ -37,8 +35,8 @@ void GUIController::draw() {
     ImGui::Checkbox("Enable spot light", &(main->scene.spot_light));
 
     ImGui::SeparatorText("Lighting color");
-    ImGui::InputFloat3("Sun light", &(main->scene.sunLight.color).x, "%.3f");
-    main->scene.sunLight.color = clamp(main->scene.sunLight.color, 0.0f, 1.0f);
+    ImGui::InputFloat3("Sun light", &(main->scene.sun_light.color).x, "%.3f");
+    main->scene.sun_light.color = clamp(main->scene.sun_light.color, 0.0f, 1.0f);
     ImGui::InputFloat3("Lanthern light", &(main->scene.lanthern_color).x, "%.3f");
     main->scene.lanthern_color = clamp(main->scene.lanthern_color, 0.0f, 1.0f);
     for (int i = 0; i < main->scene.lantern_lights.size(); i++) {
@@ -72,11 +70,7 @@ void GUIController::poll_events() {
     if (platform->key(engine::platform::KEY_Q).state() == engine::platform::Key::State::JustPressed) {
         set_enable(!is_enabled());
         auto window = platform->window();
-        if (is_enabled() == true) {
-            glfwSetInputMode(window->handle_(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        } else {
-            glfwSetInputMode(window->handle_(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
+        platform->enable_cursor(is_enabled());
     }
 }
 std::string_view app::GUIController::name() const {

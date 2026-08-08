@@ -2,8 +2,7 @@
 // Created by kaloyan on 8/5/26.
 //
 
-#include "../include/engine/resources/PointShadowMap.hpp"
-
+#include "engine/resources/PointShadowMap.hpp"
 #include "glad/glad.h"
 
 namespace engine {

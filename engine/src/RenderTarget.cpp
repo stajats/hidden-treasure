@@ -2,8 +2,9 @@
 // Created by kaloyan on 8/7/26.
 //
 
-#include "../include/engine/graphics/RenderTarget.hpp"
+#include "engine/graphics/RenderTarget.hpp"
 #include "engine/util/Errors.hpp"
+#include "glad/glad.h"
 
 namespace engine {
 namespace graphics {

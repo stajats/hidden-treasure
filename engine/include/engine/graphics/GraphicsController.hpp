@@ -122,8 +122,8 @@ public:
       */
     void bloom(int i);
 
-    unsigned int quadVAO = 0;
-    unsigned int quadVBO;
+    unsigned int quad_vao = 0;
+    unsigned int quad_vbo;
 
     /**
      * @brief Calculates and binds depth buffer for given lightsource and scene objects

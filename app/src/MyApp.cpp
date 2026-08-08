@@ -2,7 +2,7 @@
 // Created by kaloyan on 7/20/26.
 //
 
-#include "../include/MyApp.hpp"
+#include "MyApp.hpp"
 #include "GUIController.hpp"
 #include "MainController.hpp"
 #include "SkullController.hpp"

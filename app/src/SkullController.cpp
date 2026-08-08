@@ -2,13 +2,9 @@
 // Created by kaloyan on 8/4/26.
 //
 
-#include "../include/SkullController.hpp"
-
-#include "../../engine/libs/glfw/include/GLFW/glfw3.h"
+#include "SkullController.hpp"
 #include "MainController.hpp"
 #include "engine/platform/PlatformController.hpp"
-
-#include <iostream>
 
 namespace app {
 
@@ -28,7 +24,7 @@ void SkullController::draw() {
     auto main = engine::core::Controller::get<MainController>();
     if (is_enabled()) {
         for (auto object : main->scene.flame) {
-            main->draw_basic(object.resource, object.transform, object.material, main->scene.sunLight);
+            main->draw_basic(object.resource, object.transform, object.material, main->scene.sun_light);
         }
     }
 }

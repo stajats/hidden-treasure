@@ -2,7 +2,7 @@
 // Created by kaloyan on 8/7/26.
 //
 
-#include "../include/engine/graphics/Bloom.hpp"
+#include "engine/graphics/Bloom.hpp"
 
 #include "glad/glad.h"
 

@@ -2,7 +2,7 @@
 // Created by kaloyan on 8/4/26.
 //
 
-#include "../include/Scene.hpp"
+#include "Scene.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "spdlog/spdlog.h"
 
@@ -28,7 +28,7 @@ void Scene::load_scene() {
     spot_light_color = glm::vec3(0.5f, 0.5f, 0.5f);
     lanthern_color = glm::vec3(0.851, 0.114, 0.039);
     skull_color = glm::vec3(0.0f, 1.0f, 0.0f);
-    sunLight = DirectionalLight(
+    sun_light = DirectionalLight(
         -glm::normalize(glm::vec3(-0.95f, -0.16f, 0.3f)),
         glm::vec3(1.0, 0.6549, 0.149)
     );

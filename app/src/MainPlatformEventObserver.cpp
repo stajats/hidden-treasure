@@ -2,7 +2,7 @@
 // Created by kaloyan on 8/4/26.
 //
 
-#include "../include/MainPlatformEventObserver.hpp"
+#include "MainPlatformEventObserver.hpp"
 #include "engine/graphics/GraphicsController.hpp"
 #include "GUIController.hpp"
 #include "SkullController.hpp"

@@ -52,7 +52,7 @@ public:
 
     void load_scene();
 
-    DirectionalLight sunLight;
+    DirectionalLight sun_light;
     glm::vec3 lanthern_color;
     glm::vec3 spot_light_color;
     glm::vec3 skull_color;

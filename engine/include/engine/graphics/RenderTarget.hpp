@@ -7,7 +7,6 @@
 
 #include <string>
 #include <vector>
-#include "../glad/include/glad/glad.h"
 
 namespace engine {
 namespace graphics {
@@ -49,21 +48,21 @@ public:
     /**
       * @brief Returns framebuffer for this object
       */
-    GLuint framebuffer() const {
+    unsigned framebuffer() const {
         return m_fbo;
     }
 
     /**
       * @brief Returns texture at a given index for this object
       */
-    GLuint texture(size_t index) const {
+    unsigned texture(size_t index) const {
         return m_color_textures.at(index);
     }
 
     /**
       * @brief Returns all textures that belong to this object
       */
-    const std::vector<GLuint> & textures() const {
+    const std::vector<unsigned> & textures() const {
         return m_color_textures;
     }
     /**
@@ -80,9 +79,9 @@ public:
         return m_height;
     }
 private:
-    GLuint m_fbo = 0;
-    GLuint m_depth_stencil = 0;
-    std::vector<GLuint> m_color_textures;
+    unsigned m_fbo = 0;
+    unsigned m_depth_stencil = 0;
+    std::vector<unsigned> m_color_textures;
     int m_width = 0;
     int m_height = 0;
 

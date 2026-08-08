@@ -2,9 +2,8 @@
 // Created by kaloyan on 7/20/26.
 //
 
-#include "../include/MainController.hpp"
+#include "MainController.hpp"
 #include "engine/graphics/GraphicsController.hpp"
-#include "../../engine/test/app/include/app/GUIController.hpp"
 #include "GUIController.hpp"
 #include "MainPlatformEventObserver.hpp"
 #include "SkullController.hpp"
@@ -12,10 +11,9 @@
 #include "engine/platform/PlatformController.hpp"
 #include "engine/resources/ResourcesController.hpp"
 #include "spdlog/spdlog.h"
-#include "../../app/include/Scene.hpp"
+#include "Scene.hpp"
 #include <engine/resources/Skybox.hpp>
 #include <imgui_impl_opengl3.h>
-#include <iostream>
 
 void app::MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
@@ -158,10 +156,10 @@ void app::MainController::draw() {
     }
 
     for (auto &object: this->scene.objects) {
-        draw_basic(object.resource, object.transform, object.material, scene.sunLight);
+        draw_basic(object.resource, object.transform, object.material, scene.sun_light);
     }
     for (auto &object: this->scene.lantern) {
-        draw_basic(object.resource, object.transform, object.material, scene.sunLight);
+        draw_basic(object.resource, object.transform, object.material, scene.sun_light);
     }
     draw_skybox();
 }
